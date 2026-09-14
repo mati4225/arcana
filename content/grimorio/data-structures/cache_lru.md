@@ -1,11 +1,14 @@
 ### 1. Qué es y cómo funciona
 
 **Intuición**
-Imaginá la memoria caché de un microprocesador: el espacio es diminuto, pero inmensamente rápido. Cuando el espacio se llena y necesitamos traer un dato nuevo, debemos decidir qué borrar. La estrategia **LRU (Least Recently Used - Menos Usado Recientemente)** asume que los datos que hace más tiempo no se consultan son los menos propensos a necesitarse en el futuro inmediato. El problema central que resuelve es la **latencia**: evita accesos costosos (a disco o red) manteniendo en memoria rápida únicamente la información más demandada por el sistema.
+Una **Caché LRU (Least Recently Used)** puede pensarse como un escritorio de trabajo pequeño: si se llena de libros y necesitamos traer uno nuevo de la biblioteca, la decisión más lógica es devolver a la biblioteca el libro que hace más tiempo no tocamos. 
+
+La idea central es mantener en una memoria rápida y de acceso inmediato los datos más demandados, asumiendo que la información que no se consultó recientemente tiene baja probabilidad de ser requerida a la brevedad. Resuelve el problema de la latencia al evitar consultas repetitivas y costosas (a disco, red o bases de datos).
 
 **Definición y propiedades**
 Un Caché LRU es una estructura de datos de tamaño fijo que mantiene un registro del orden temporal en que sus elementos fueron accedidos. Sus propiedades invariantes son:
 
+Propiedades clave:
 * **Límite de capacidad:** Nunca excede el tamaño máximo predefinido.
 * **Política de desalojo:** Al alcanzar su capacidad máxima y recibir un nuevo elemento, expulsa estrictamente aquel que lleva más tiempo sin ser leído o modificado.
 * **Complejidad estricta:** Todas sus operaciones elementales deben ejecutarse en un tiempo garantizado de $O(1)$.
@@ -13,12 +16,10 @@ Un Caché LRU es una estructura de datos de tamaño fijo que mantiene un registr
 **Representación**
 Para lograr accesos y actualizaciones inmediatas, la caché LRU no puede depender de una sola estructura; orquesta dos trabajando en conjunto:
 
-1. **Un Diccionario ([Hash Map](https://programacion-avanzada.github.io/arcana/grimorio/data-structures/hash-table)):** Almacena las claves apuntando directamente a la ubicación física de los datos. Esto permite saber si un dato existe (y accederlo) de forma instantánea (sin necesidad de recorrer la lista).
-2. **Una Lista Doblemente Enlazada ([Doubly Linked List](https://programacion-avanzada.github.io/arcana/grimorio/data-structures/doubly-linked-list)):** Mantiene el orden de prioridad temporal. El "Frente" (Head) guarda el dato usado más recientemente, y el "Final" (Tail) guarda el candidato a ser borrado. Al ser doblemente enlazada, permite arrancar un nodo del medio y moverlo al frente en $O(1)$ sin tener que recorrer toda la estructura.
+1. **Un Diccionario [[hash table]]**Almacena las claves apuntando directamente a la ubicación física de los datos. Esto permite saber si un dato existe (y accederlo) de forma instantánea (sin necesidad de recorrer la lista).
+2. **Una Lista Doblemente Enlazada [[linked list]]** Mantiene el orden de prioridad temporal. El "Frente" (Head) guarda el dato usado más recientemente, y el "Final" (Tail) guarda el candidato a ser borrado. Al ser doblemente enlazada, permite arrancar un nodo del medio y moverlo al frente en $O(1)$ sin tener que recorrer toda la estructura.
 
-**(Esta imagen tiene que ser un SVG que nose que es)**
-
-![alt text](image.png)
+![Diagrama de arquitectura de un Caché LRU: Hash Map sincronizado con una Lista Doblemente Enlazada](cache_lru.svg)
 
 
 ### 2. Operaciones y complejidad
@@ -47,14 +48,13 @@ Imaginá que el diccionario (Hash Map) es un mueble enorme con 100 cajones numer
 * **Colisiones en el diccionario:** Para que la búsqueda sea instantánea ($O(1)$), el diccionario interno debe repartir equitativamente los datos en la memoria. Si varios datos terminan asignados a la misma posición (lo que se conoce como colisión), el sistema tendrá que revisarlos uno por uno dentro de ese casillero, lo que hace que la lectura pierda su velocidad inmediata en esos casos aislados. 
 
 
-
 ### 3. Implementación
 
 **Idea de implementación**
 La arquitectura de una Caché LRU requiere mantener dos estructuras de datos sincronizadas en todo momento:
 
-1. Una **[Tabla Hash / Diccionario](https://programacion-avanzada.github.io/arcana/grimorio/data-structures/hash-table)** que mapea las claves directamente hacia los nodos físicos.
-2. Una **[Lista Doblemente Enlazada](https://programacion-avanzada.github.io/arcana/grimorio/data-structures/doubly-linked-list)** abstracta (con un puntero al `frente` y otro al `final`) que dicta el orden de antigüedad.
+1. Una **[[hash table]]** que mapea las claves directamente hacia los nodos físicos.
+2. Una **[[linked list]]** abstracta (con un puntero al `frente` y otro al `final`) que dicta el orden de antigüedad.
 
 La clave del algoritmo es que el diccionario no guarda el valor crudo, sino el "nodo" entero de la lista. Así, cuando buscamos una clave, el diccionario nos devuelve el nodo exacto, permitiéndonos reubicarlo manipulando sus punteros sin necesidad de recorrer la lista.
 
@@ -96,4 +96,8 @@ class LRUCache:
             self.hash_map[key] = nuevo_nodo
 
 
-referencias: logicmojo.com
+## 6. Referencias y recursos
+
+*   Silberschatz, A., Galvin, P. B., & Gagne, G. (2018). *Operating System Concepts* (10ma ed.). Capítulo sobre Memoria Virtual y Políticas de Reemplazo de Páginas.
+*   Cormen, T. H., Leiserson, C. E., Rivest, L. R., & Stein, C. (2009). *Introduction to Algorithms* (3ra ed.). MIT Press. (Fundamentos sobre el tiempo amortizado en Tablas Hash y Listas Enlazadas).
+*   LogicMojo. "LRU Cache Implementation". Disponible en: [https://logicmojo.com/lru-cache-implementation](https://logicmojo.com/lru-cache-implementation)

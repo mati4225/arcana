@@ -1,0 +1,75 @@
+<svg width="800" height="450" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <!-- Puntas de flecha -->
+  <defs>
+    <marker id="arrow-solid" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2c3e50" />
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2980b9" />
+    </marker>
+  </defs>
+
+  <rect width="100%" height="100%" fill="#ffffff" />
+  <text x="400" y="35" font-size="22" font-weight="bold" text-anchor="middle" fill="#2c3e50">Arquitectura Caché LRU</text>
+
+  <!-- HASH MAP (Arriba) -->
+  <rect x="200" y="70" width="400" height="90" rx="10" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="2"/>
+  <text x="400" y="100" font-size="16" font-weight="bold" text-anchor="middle" fill="#2980b9">1. Hash Map (Acceso instantáneo O(1))</text>
+  
+  <g transform="translate(230, 110)">
+    <rect x="0" y="0" width="100" height="30" rx="3" fill="#3498db" />
+    <text x="50" y="20" fill="#fff" font-weight="bold" text-anchor="middle">Clave C</text>
+    <circle cx="50" cy="35" r="5" fill="#2c3e50" />
+  </g>
+  <g transform="translate(350, 110)">
+    <rect x="0" y="0" width="100" height="30" rx="3" fill="#3498db" />
+    <text x="50" y="20" fill="#fff" font-weight="bold" text-anchor="middle">Clave A</text>
+    <circle cx="50" cy="35" r="5" fill="#2c3e50" />
+  </g>
+  <g transform="translate(470, 110)">
+    <rect x="0" y="0" width="100" height="30" rx="3" fill="#3498db" />
+    <text x="50" y="20" fill="#fff" font-weight="bold" text-anchor="middle">Clave B</text>
+    <circle cx="50" cy="35" r="5" fill="#2c3e50" />
+  </g>
+
+  <!-- LISTA DOBLEMENTE ENLAZADA (Abajo) -->
+  <rect x="100" y="260" width="600" height="150" rx="10" fill="#f8f9fa" stroke="#e0e0e0" stroke-width="2"/>
+  <text x="400" y="290" font-size="16" font-weight="bold" text-anchor="middle" fill="#27ae60">2. Lista Doblemente Enlazada (Orden Temporal)</text>
+
+  <!-- Nodo A (Head - Más reciente) -->
+  <g transform="translate(150, 320)">
+    <rect x="0" y="0" width="120" height="50" rx="5" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+    <text x="60" y="20" font-weight="bold" fill="#fff" text-anchor="middle">Valor A</text>
+    <text x="60" y="40" font-size="12" fill="#fff" text-anchor="middle">(Más reciente)</text>
+    <text x="60" y="-15" font-size="16" font-weight="bold" fill="#27ae60" text-anchor="middle">FRENTE (Head)</text>
+  </g>
+
+  <!-- Nodo B (Medio) -->
+  <g transform="translate(340, 320)">
+    <rect x="0" y="0" width="120" height="50" rx="5" fill="#f1c40f" stroke="#f39c12" stroke-width="2"/>
+    <text x="60" y="30" font-weight="bold" fill="#fff" text-anchor="middle">Valor B</text>
+  </g>
+
+  <!-- Nodo C (Tail - Menos usado) -->
+  <g transform="translate(530, 320)">
+    <rect x="0" y="0" width="120" height="50" rx="5" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+    <text x="60" y="20" font-weight="bold" fill="#fff" text-anchor="middle">Valor C</text>
+    <text x="60" y="40" font-size="12" fill="#fff" text-anchor="middle">(Candidato)</text>
+    <text x="60" y="-15" font-size="16" font-weight="bold" fill="#e74c3c" text-anchor="middle">FINAL (Tail)</text>
+  </g>
+
+  <!-- Flechas de la Lista Doble -->
+  <line x1="270" y1="335" x2="330" y2="335" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow-solid)"/>
+  <line x1="335" y1="355" x2="275" y2="355" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow-solid)"/>
+
+  <line x1="460" y1="335" x2="520" y2="335" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow-solid)"/>
+  <line x1="525" y1="355" x2="465" y2="355" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow-solid)"/>
+
+  <!-- Punteros desde el Hash a los Nodos -->
+  <!-- Clave A -> Valor A -->
+  <path d="M 400 145 C 400 200, 210 200, 210 310" fill="none" stroke="#2980b9" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-blue)"/>
+  <!-- Clave B -> Valor B -->
+  <path d="M 520 145 C 520 230, 400 230, 400 310" fill="none" stroke="#2980b9" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-blue)"/>
+  <!-- Clave C -> Valor C -->
+  <path d="M 280 145 C 280 240, 590 240, 590 310" fill="none" stroke="#2980b9" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-blue)"/>
+</svg>
