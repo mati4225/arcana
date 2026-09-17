@@ -13,10 +13,10 @@ Un Caché LRU es una estructura de datos de tamaño fijo que mantiene un registr
   Nunca excede el tamaño máximo predefinido.
 
 - **Política de desalojo:**
-  Al alcanzar su capacidad máxima y recibir un nuevo elemento, expulsa estrictamente aquel que lleva más tiempo sin ser leído o modificado.
+  Al alcanzar su capacidad máxima y recibir un nuevo elemento, expulsa estrictamente aquel que lleva más tiempo sin ser accedido.
 
 - **Complejidad estricta:** 
-  Todas sus operaciones elementales deben ejecutarse en un tiempo garantizado de $O(1)$.
+  `get` y `put` pueden implementarse en O(1) en promedio utilizando una hash table y una lista doblemente enlazada.
 
 ### Representación
 
@@ -25,9 +25,9 @@ Un Caché LRU es una estructura de datos de tamaño fijo que mantiene un registr
 Para lograr accesos y actualizaciones inmediatas, la caché LRU orquesta dos estructuras trabajando en conjunto:
 
 1. **Un Diccionario [[hash table]]**
-   Almacena las claves apuntando directamente a la ubicación física de los datos. Esto permite saber si un dato existe (y accederlo) de forma instantánea (sin necesidad de recorrer la lista).
+   Asocia cada clave con el nodo correspondiente de la lista. Esto permite localizar un nodo directamente, sin necesidad de recorrer la lista
 
-2. **Una Lista Doblemente Enlazada [[linked list]]** 
+2. **Una Lista Doblemente Enlazada [[doubly linked list]]** 
    Mantiene el orden de prioridad temporal. El "Frente" (Head) guarda el dato usado más recientemente, y el "Final" (Tail) guarda el candidato a ser borrado. Al ser doblemente enlazada, permite arrancar un nodo del medio y moverlo al frente en $O(1)$ sin tener que recorrer toda la estructura.
 
 ## 2. Operaciones y complejidad
@@ -35,9 +35,9 @@ Para lograr accesos y actualizaciones inmediatas, la caché LRU orquesta dos est
 
 - **`get(clave)`** → Busca un dato. Si la clave existe en el diccionario (_Cache Hit_), la función retorna el valor y, simultáneamente, extrae el nodo de su posición actual en la lista doblemente enlazada para insertarlo en el frente (marcándolo como el más reciente). Si no existe (_Cache Miss_), retorna vacío.
 - **`put(clave, valor)`** → Inserta o actualiza un dato. 
-	  Si la clave ya existe, actualiza su valor y mueve el nodo al frente de la lista.
-	  Si es un dato nuevo, crea el nodo y lo inserta en el frente.
-- **Desalojo:** → Si la inserción supera la capacidad máxima de la caché, la función elimina el último nodo de la lista (el menos usado) y borra su clave correspondiente del diccionario.
+	- Si la clave ya existe, actualiza su valor y mueve el nodo al frente de la lista.
+	- Si es un dato nuevo, crea el nodo y lo inserta en el frente.
+- **Desalojo:** → Si la caché ya alcanzó su capacidad máxima y se inserta una nueva clave, la función elimina el último nodo de la lista (el menos recientemente utilizado) y borra su clave correspondiente del diccionario.
 
 ### Complejidad
 #### Complejidad temporal
@@ -67,9 +67,8 @@ El costo de recuperar un dato desde la memoria principal, disco o red tras un ca
 ### Idea de implementación
 La arquitectura de una Caché LRU requiere mantener dos estructuras de datos sincronizadas en todo momento:
 
-1. Una **[[hash table]]** que mapea las claves directamente hacia los nodos físicos.
-2. Una **[[doubly linked list]]** abstracta (con un puntero al `frente` y otro al `final`) que dicta el orden de recencia de uso.
-
+1. Una **[[hash table]]** que asocia cada clave con el nodo correspondiente de la lista
+2. Una **[[doubly linked list]]** abstracta (con un puntero al `frente` y otro al `final`) que dicta el orden de recencia de uso
 
 La clave del algoritmo es que el diccionario no guarda el valor crudo, sino el "nodo" entero de la lista. Así, cuando buscamos una clave, el diccionario nos devuelve el nodo exacto, permitiéndonos reubicarlo manipulando sus punteros sin necesidad de recorrer la lista.
 
@@ -132,12 +131,12 @@ class LRUCache:
 Ventajas:
 
 - **Complejidad temporal O(1)**: Sus dos operaciones (get, put) tienen una complejidad temporal constante.
-- **Eficiencia espacial**: Garantiza que solo los datos más utilizados se almacenen en memoria.
+- **Eficiencia en accesos repetidos:** mantiene los datos utilizados recientemente, reduciendo la necesidad de recuperarlos nuevamente desde la fuente original
 
 Desventajas:
 
 - **Tamaño limitado**: La cache se limita por la capacidad especificada por lo que los datos a los que se accede con menos frecuencia serán eliminados
-- **Fallos en la cache**: Cuando la cache esta llena, cualquier nuevo acceso provoca un fallo que obliga a obtener los datos de la fuente original
+- **Cache misses:** cuando un dato solicitado no se encuentra en la caché, debe obtenerse nuevamente desde la fuente original.
 - **Sobrecarga de memoria**: requiere mantener una hash table y una lista doblemente enlazada sincronizadas, lo que aumenta el uso de memoria
 
 ### Señales de reconocimiento
@@ -150,11 +149,11 @@ Desventajas:
 ### Variantes
 - **LFU**: elimina el elemento utilizado con menor frecuencia.
 - **FIFO**: elimina el primer elemento que ingresó.
-- **MRU**: elimina el elemento utilizado mas recientemente.
+- **MRU**: elimina el elemento utilizado más recientemente.
 
-### Relacion con otras estructuras
-- **Hash Map ([[hash table]])**: Para permitir un acceso en tiempo constante $O(1)$ a los elementos de la caché.
-- **Lista doblemente enlazada ([[doubly linked list]])**: Para mantener el orden de acceso.
+### Relación con otras estructuras
+- **Hash Map ([[hash table]])**: Para permitir un acceso en tiempo constante $O(1)$ a los elementos de la caché
+- **Lista doblemente enlazada ([[doubly linked list]])**: Para mantener el orden de acceso
 
 ### Notas avanzadas
 En sistemas con múltiples hilos, se deben sincronizar los accesos para evitar inconsistencias. A su vez, se requiere definir un tamaño máximo y una estrategia para expulsar elementos, y además de almacenar los datos, la implementación necesita estructuras auxiliares para mantener el orden de uso.
