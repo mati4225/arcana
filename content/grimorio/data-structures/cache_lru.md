@@ -1,6 +1,7 @@
 ## 1. Qué es y cómo funciona
 
 ### Intuición
+
 Una **Caché LRU (Least Recently Used)** puede pensarse como un escritorio de trabajo pequeño: si se llena de libros y necesitamos traer uno nuevo de la biblioteca, la decisión más lógica es devolver a la biblioteca el libro que hace más tiempo no tocamos.
 
 La idea central es mantener en una memoria rápida y de acceso inmediato los datos más demandados, asumiendo que la información que no se consultó recientemente tiene baja probabilidad de ser requerida a la brevedad. Resuelve el problema de la latencia al evitar consultas repetitivas y costosas (a disco, red o bases de datos).
@@ -50,12 +51,14 @@ Las operaciones de una Caché LRU se reducen a leer y escribir. Para que el sist
 | Mover nodo en la lista    | $$O(1)$$ | $$O(1)$$                   |
 | Eliminar nodo de la lista | $$O(1)$$ | $$O(1)$$                   |
 
+**Nota**: El peor caso $O(n)$ corresponde a la implementación interna de la hash table cuando ocurren muchas colisiones.
+El costo de recuperar un dato desde la memoria principal, disco o red tras un cache miss no forma parte de la complejidad de la estructura LRU, sino del sistema que la utiliza.
 #### Complejidad Espacial
 
 - **Espacio total:** **O(n)**, donde `n` es la capacidad máxima de la caché.
 
 - La caché utiliza dos estructuras principales: un **diccionario (HashMap)** que almacena hasta `n` entradas y una **lista doblemente enlazada** que almacena hasta `n` nodos.
-- Por lo tanto, el espacio utilizado es `O(n) + O(n) = O(n)`.
+- Por lo tanto, el espacio utilizado es $O(n) + O(n) = O(n)$.
 
 ### Detalles operativos (Costos ocultos)
 
@@ -120,12 +123,18 @@ class LRUCache:
 - Gestión de memoria
 
 ### Cuando no usarlo
-⚠️⚠️⚠️⚠️
+
+- Cuando los datos se recorren secuencialmente y rara vez vuelven a consultarse.
+- Cuando el criterio de reemplazo debe basarse en la frecuencia de uso y no en la recencia
+- Cuando es necesario conservar todos los elementos sin desalojos automáticos.
+- Cuando el costo adicional de mantener una hash table y una lista doblemente enlazada no se justifica.
 
 ### Comparaciones
 
-LRU Cache se directamente con otras estrategias de almacenamiento cache como lo pueden ser LFU (Last frecuently use), FIFO (First In First Out), MRU (Most Recently Use) o Random.
-
+- **vs LFU** → prioriza la frecuencia, no la recencia. 
+- **vs FIFO** → reemplaza por uso reciente, no por antigüedad.
+- **vs MRU** → elimina el menos reciente, no el más reciente.
+- **vs Random** → reemplazo basado en uso, no al azar.
 ### Ventajas
 
 - Complejidad temporal O(1): Sus dos operaciones (get, put) tienen una complejidad temporal constante.
@@ -133,13 +142,16 @@ LRU Cache se directamente con otras estrategias de almacenamiento cache como lo 
 
 ### Desventajas
 
-- Tamaño limitado: La cache se limita por la capacidad especificada por lo que los datos a los que se accede con menos frecuencia serán eliminados.
-- Fallos en la cache: Cuando la cache esta llena, cualquiera nuevo acceso provoca un fallo que obliga a obtener los datos de la fuente original.
+- **Tamaño limitado**: La cache se limita por la capacidad especificada por lo que los datos a los que se accede con menos frecuencia serán eliminados
+- **Fallos en la cache**: Cuando la cache esta llena, cualquier nuevo acceso provoca un fallo que obliga a obtener los datos de la fuente original
+- **Sobrecarga de memoria**: requiere mantener una hash table y una lista doblemente enlazada sincronizadas, lo que aumenta el uso de memoria
 
 ### Señales de reconocimiento
 
-⚠️⚠️⚠️⚠️
-
+- Accesos repetidos a los mismos datos
+- Límite fijo de memoria
+- Acceso costoso a la fuente original
+- Reemplazo según uso reciente.
 
 ## 5. Relaciones y Extensiones
 
