@@ -1,3 +1,12 @@
+---
+title: LRU Cache
+tags:
+  - data-structures
+alias:
+  - caché LRU
+  - least recently used cache
+---
+
 ## 1. Qué es y cómo funciona
 ### Intuición
 Una **Caché LRU (Least Recently Used)** puede pensarse como un escritorio de trabajo pequeño: si se llena de libros y necesitamos traer uno nuevo de la biblioteca, la decisión más lógica es devolver a la biblioteca el libro que hace más tiempo no tocamos.
@@ -20,7 +29,7 @@ Un Caché LRU es una estructura de datos de tamaño fijo que mantiene un registr
 
 ### Representación
 
-![Diagrama de arquitectura de un Caché LRU: Hash Map sincronizado con una Lista Doblemente Enlazada](cache_lru.svg)
+![[cache_lru.svg]]
 
 Para lograr accesos y actualizaciones inmediatas, la caché LRU orquesta dos estructuras trabajando en conjunto:
 
