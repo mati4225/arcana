@@ -10,7 +10,7 @@ alias:
 ### Intuición
 Una **Caché LRU (Least Recently Used)** puede pensarse como un escritorio de trabajo pequeño: si se llena de libros y necesitamos traer uno nuevo de la biblioteca, la decisión más lógica es devolver a la biblioteca el libro que hace más tiempo no tocamos.
 
-La idea central es mantener en una memoria rápida y de acceso inmediato los datos más demandados, asumiendo que la información que no se consultó recientemente tiene baja probabilidad de ser requerida a la brevedad. Resuelve el problema de la latencia al evitar consultas repetitivas y costosas (a disco, red o bases de datos).
+La idea central es mantener en memoria rápida los datos más demandados, asumiendo que los datos usados recientemente tienen mayor probabilidad de volver a necesitarse. Así, se evitan consultas repetitivas y costosas a disco, red o bases de datos.
 
 ### Definición / propiedades
 #### Definición
@@ -33,7 +33,7 @@ Un Caché LRU es una estructura de datos de tamaño fijo que mantiene un registr
 Para lograr accesos y actualizaciones inmediatas, la caché LRU orquesta dos estructuras trabajando en conjunto:
 
 1. **Un Diccionario [[hash table]]**
-   Asocia cada clave con el nodo correspondiente de la lista. Esto permite localizar un nodo directamente, sin necesidad de recorrer la lista
+   Asocia cada clave con el nodo correspondiente de la lista, permitiendo localizarlo directamente sin recorrer la lista.
 
 2. **Una Lista Doblemente Enlazada [[doubly linked list]]** 
    Mantiene el orden de prioridad temporal. El "Frente" (Head) guarda el dato usado más recientemente, y el "Final" (Tail) guarda el candidato a ser borrado. Al ser doblemente enlazada, permite arrancar un nodo del medio y moverlo al frente en $O(1)$ sin tener que recorrer toda la estructura.
@@ -41,11 +41,11 @@ Para lograr accesos y actualizaciones inmediatas, la caché LRU orquesta dos est
 ## 2. Operaciones y complejidad
 ### Operaciones principales
 
-- **`get(clave)`** → Busca un dato. Si la clave existe en el diccionario (_Cache Hit_), la función retorna el valor y, simultáneamente, extrae el nodo de su posición actual en la lista doblemente enlazada para insertarlo en el frente (marcándolo como el más reciente). Si no existe (_Cache Miss_), retorna vacío.
+- **`get(clave)`** → Busca un dato. Si la clave existe en el diccionario (_Cache Hit_), la función retorna el valor y mueve el nodo al frente (marcándolo como el más reciente). Si no existe (_Cache Miss_), retorna vacío.
 - **`put(clave, valor)`** → Inserta o actualiza un dato. 
 	- Si la clave ya existe, actualiza su valor y mueve el nodo al frente de la lista.
 	- Si es un dato nuevo, crea el nodo y lo inserta en el frente.
-- **Desalojo:** → Si la caché ya alcanzó su capacidad máxima y se inserta una nueva clave, la función elimina el último nodo de la lista (el menos recientemente utilizado) y borra su clave correspondiente del diccionario.
+- **Desalojo:** → Si la caché ya alcanzó su capacidad máxima y se inserta una nueva clave, elimina el último nodo de la lista (el menos recientemente utilizado) y borra su clave del diccionario.
 
 ### Complejidad
 #### Complejidad temporal
@@ -67,16 +67,16 @@ El costo de recuperar un dato desde la memoria principal, disco o red tras un ca
 - La caché mantiene un diccionario (HashMap) y una lista doblemente enlazada, cada uno con hasta `n` elementos, por lo que el espacio total sigue siendo $O(n)$.
 
 ### Detalles operativos (Costos ocultos)
-- **Sobrecarga de punteros (Memory Overhead):** Para mantener la lista doblemente enlazada, cada dato almacenado requiere memoria extra para guardar dos punteros (uno hacia el nodo anterior y otro hacia el siguiente). En entornos con memoria extremadamente restringida, este costo marginal puede ser un factor a considerar.
+- **Sobrecarga de punteros (Memory Overhead):** La lista doblemente enlazada requiere dos punteros adicionales por nodo (hacia el nodo anterior y hacia el siguiente). En entornos con memoria extremadamente restringida, este costo marginal puede ser un factor a considerar.
 
 - **Colisiones en el diccionario:** El rendimiento promedio es $O(1)$, pero si varias claves caen en la misma posición (colisión), el diccionario debe revisarlas, pudiendo degradar la operación hasta $O(n)$ en el peor caso.
 
 ## 3. Implementación
 ### Idea de implementación
-La arquitectura de una Caché LRU requiere mantener dos estructuras de datos sincronizadas en todo momento:
+Requiere mantener dos estructuras de datos sincronizadas en todo momento:
 
-1. Una **[[hash table]]** que asocia cada clave con el nodo correspondiente de la lista
-2. Una **[[doubly linked list]]** abstracta (con un puntero al `frente` y otro al `final`) que dicta el orden de recencia de uso
+1. Una **[[hash table]]** que asocia cada clave con el nodo correspondiente de la lista.
+2. Una **[[doubly linked list]]** abstracta (con un puntero al `frente` y otro al `final`) que dicta el orden de recencia de uso.
 
 La clave del algoritmo es que el diccionario no guarda el valor crudo, sino el "nodo" entero de la lista. Así, cuando buscamos una clave, el diccionario nos devuelve el nodo exacto, permitiéndonos reubicarlo manipulando sus punteros sin necesidad de recorrer la lista.
 
@@ -119,7 +119,7 @@ class LRUCache:
 ```
 
 #### Ejemplo de uso típico
-Uso de una caché LRU con capacidad limitada
+Uso de una caché LRU con capacidad limitada:
 
 ```python
 cache = LRUCache(2)
@@ -140,36 +140,36 @@ cache.get(3)       # Devuelve "C"
 ## 4. Uso y criterio
 ### Casos de uso
 - Almacenamiento de cache en sitios web y en consultas de bases de datos.
-- Gestión de sesiones
-- Gestión de memoria
+- Gestión de sesiones.
+- Gestión de memoria.
 
 ### Cuando no usarlo
-- Cuando los datos se recorren secuencialmente y rara vez vuelven a consultarse
-- Cuando el criterio de reemplazo debe basarse en la frecuencia de uso y no en la recencia
-- Cuando es necesario conservar todos los elementos sin desalojos automáticos
-- Cuando el costo adicional de mantener una hash table y una lista doblemente enlazada no se justifica
+- Cuando los datos se recorren secuencialmente y rara vez vuelven a consultarse.
+- Cuando el criterio de reemplazo debe basarse en la frecuencia de uso y no en la recencia.
+- Cuando es necesario conservar todos los elementos sin desalojos automáticos.
+- Cuando el costo adicional de mantener una hash table y una lista doblemente enlazada no se justifica.
 
 ### Comparaciones
 - **vs LFU** → prioriza la frecuencia, no la recencia.
-- **vs FIFO** → reemplaza por uso reciente, no por antigüedad
-- **vs MRU** → elimina el menos reciente, no el más reciente
-- **vs Random** → reemplazo basado en uso, no al azar
+- **vs FIFO** → reemplaza por uso reciente, no por antigüedad.
+- **vs MRU** → elimina el menos reciente, no el más reciente.
+- **vs Random** → reemplazo basado en uso, no al azar.
 ### Ventajas / desventajas
 Ventajas:
 
 - **Complejidad temporal $O(1)$**: Sus dos operaciones (get, put) tienen una complejidad temporal constante.
-- **Eficiencia en accesos repetidos:** mantiene los datos utilizados recientemente, reduciendo la necesidad de recuperarlos nuevamente desde la fuente original
+- **Eficiencia en accesos repetidos:** mantiene los datos utilizados recientemente, reduciendo la necesidad de recuperarlos nuevamente desde la fuente original.
 
 Desventajas:
 
-- **Tamaño limitado**: La cache se limita por la capacidad especificada por lo que los datos a los que se accede con menos frecuencia serán eliminados
+- **Tamaño limitado**: La cache se limita por la capacidad especificada por lo que los datos a los que se accede con menos frecuencia serán eliminados.
 - **Cache misses:** cuando un dato solicitado no se encuentra en la caché, debe obtenerse nuevamente desde la fuente original.
-- **Sobrecarga de memoria**: requiere mantener una hash table y una lista doblemente enlazada sincronizadas, lo que aumenta el uso de memoria
+- **Sobrecarga de memoria**: requiere mantener una hash table y una lista doblemente enlazada sincronizadas, lo que aumenta el uso de memoria.
 
 ### Señales de reconocimiento
-- Accesos repetidos a los mismos datos
-- Límite fijo de memoria
-- Acceso costoso a la fuente original
+- Accesos repetidos a los mismos datos.
+- Límite fijo de memoria.
+- Acceso costoso a la fuente original.
 - Reemplazo según uso reciente.
 
 ## 5. Relaciones y Extensiones
@@ -179,8 +179,8 @@ Desventajas:
 - **MRU**: elimina el elemento utilizado más recientemente.
 
 ### Relación con otras estructuras
-- **Hash Map ([[hash table]])**: Para permitir un acceso en tiempo constante $O(1)$ a los elementos de la caché
-- **Lista doblemente enlazada ([[doubly linked list]])**: Para mantener el orden de acceso
+- **Hash Map ([[hash table]])**: Para permitir un acceso en tiempo constante $O(1)$ a los elementos de la caché.
+- **Lista doblemente enlazada ([[doubly linked list]])**: Para mantener el orden de acceso.
 
 ### Notas avanzadas
 En sistemas con múltiples hilos, se deben sincronizar los accesos para evitar inconsistencias. A su vez, se requiere definir un tamaño máximo y una estrategia para expulsar elementos, y además de almacenar los datos, la implementación necesita estructuras auxiliares para mantener el orden de uso.
