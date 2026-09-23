@@ -6,7 +6,6 @@ alias:
   - caché LRU
   - least recently used cache
 ---
-
 ## 1. Qué es y cómo funciona
 ### Intuición
 Una **Caché LRU (Least Recently Used)** puede pensarse como un escritorio de trabajo pequeño: si se llena de libros y necesitamos traer uno nuevo de la biblioteca, la decisión más lógica es devolver a la biblioteca el libro que hace más tiempo no tocamos.
@@ -25,7 +24,7 @@ Un Caché LRU es una estructura de datos de tamaño fijo que mantiene un registr
   Al alcanzar su capacidad máxima y recibir un nuevo elemento, expulsa estrictamente aquel que lleva más tiempo sin ser accedido.
 
 - **Complejidad estricta:** 
-  `get` y `put` pueden implementarse en O(1) en promedio utilizando una hash table y una lista doblemente enlazada.
+  `get` y `put` pueden implementarse en $O(1)$ en promedio utilizando una hash table y una lista doblemente enlazada.
 
 ### Representación
 
@@ -53,10 +52,10 @@ Para lograr accesos y actualizaciones inmediatas, la caché LRU orquesta dos est
 
 | Métodos                   | Promedio | Peor caso / con colisiones |
 | ------------------------- | -------- | -------------------------- |
-| `get(clave)`              | $$O(1)$$ | $$O(n)$$                   |
-| `put(clave, valor)`       | $$O(1)$$ | $$O(n)$$                   |
-| Mover nodo en la lista    | $$O(1)$$ | $$O(1)$$                   |
-| Eliminar nodo de la lista | $$O(1)$$ | $$O(1)$$                   |
+| `get(clave)`              | $O(1)$   | $O(n)$                     |
+| `put(clave, valor)`       | $O(1)$   | $O(n)$                     |
+| Mover nodo en la lista    | $O(1)$   | $O(1)$                     |
+| Eliminar nodo de la lista | $O(1)$   | $O(1)$                     |
 
 **Nota**: 
 
@@ -65,7 +64,7 @@ El costo de recuperar un dato desde la memoria principal, disco o red tras un ca
 #### Complejidad Espacial
 - Espacio total: $O(n)$, donde `n` es la capacidad máxima de la caché.
 
-- La caché mantiene un diccionario (HashMap) y una lista doblemente enlazada, cada uno con hasta `n` elementos, por lo que el espacio total sigue siendo O(n).
+- La caché mantiene un diccionario (HashMap) y una lista doblemente enlazada, cada uno con hasta `n` elementos, por lo que el espacio total sigue siendo $O(n)$.
 
 ### Detalles operativos (Costos ocultos)
 - **Sobrecarga de punteros (Memory Overhead):** Para mantener la lista doblemente enlazada, cada dato almacenado requiere memoria extra para guardar dos punteros (uno hacia el nodo anterior y otro hacia el siguiente). En entornos con memoria extremadamente restringida, este costo marginal puede ser un factor a considerar.
@@ -119,6 +118,25 @@ class LRUCache:
             self.hash_map[key] = nuevo_nodo
 ```
 
+#### Ejemplo de uso típico
+Uso de una caché LRU con capacidad limitada
+
+```python
+cache = LRUCache(2)
+
+cache.put(1, "A")  # Cache: [1]
+cache.put(2, "B")  # Cache: [2, 1]
+
+cache.get(1)       # Devuelve "A"
+                   # Cache: [1, 2]
+
+cache.put(3, "C")  # Se elimina la clave 2 (menos usada)
+                   # Cache: [3, 1]
+
+cache.get(2)       # Devuelve -1 (no está en la caché)
+
+cache.get(3)       # Devuelve "C"
+```
 ## 4. Uso y criterio
 ### Casos de uso
 - Almacenamiento de cache en sitios web y en consultas de bases de datos.
@@ -139,7 +157,7 @@ class LRUCache:
 ### Ventajas / desventajas
 Ventajas:
 
-- **Complejidad temporal O(1)**: Sus dos operaciones (get, put) tienen una complejidad temporal constante.
+- **Complejidad temporal $O(1)$**: Sus dos operaciones (get, put) tienen una complejidad temporal constante.
 - **Eficiencia en accesos repetidos:** mantiene los datos utilizados recientemente, reduciendo la necesidad de recuperarlos nuevamente desde la fuente original
 
 Desventajas:
