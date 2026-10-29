@@ -1,0 +1,181 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1150 850" width="1150" height="850">
+  <style>
+    /* CSS Oficial de Arcana inyectado */
+    text { font-family: 'Courier New', Courier, monospace; }
+    .frame, .cell { fill: #f5f7fa; stroke: #9baec8; stroke-width: 1.5; }
+    .divider      { stroke: #9baec8; stroke-width: 1; }
+    .val          { font-size: 20px; font-weight: 700; fill: #1a1a2e; text-anchor: middle; dominant-baseline: middle; }
+    .val-sm       { font-size: 15px; font-weight: 700; fill: #1a1a2e; text-anchor: middle; dominant-baseline: middle;} 
+    .idx          { font-size: 14px; fill: #777777; text-anchor: middle; dominant-baseline: middle;} 
+    .link         { stroke: #9baec8; stroke-width: 1.8; fill: none; }
+    .link-fill    { fill: #9baec8; }
+    .ghost        { fill: #f5f7fa; fill-opacity: 0.5; stroke: #777777; stroke-width: 1.5; stroke-dasharray: 4,3; }
+    .ghost-val    { font-size: 16px; font-weight: 700; fill: #555555; text-anchor: middle; dominant-baseline: middle;}
+    .op           { font-size: 13px; font-weight: 700; fill: #777777; text-anchor: middle; dominant-baseline: middle;}
+    .op-arrow     { stroke: #777777; stroke-width: 1.5; fill: none; }
+    .op-arrow-fill{ fill: #777777; }
+    .top-label, .accent-label   { font-size: 13px; font-weight: 700; fill: #c0742a; text-anchor: middle; dominant-baseline: middle;}
+    .top-arrow, .accent-arrow   { stroke: #c0742a; stroke-width: 1.8; fill: none; }
+    .top-arrow-fill, .accent-arrow-fill { fill: #c0742a; }
+    .query { fill: #f5f7fa; stroke: #c0742a; stroke-width: 1.8; }
+    .cell-null { fill: #fff4e6; stroke: #c0742a; stroke-width: 1.5; stroke-dasharray: 5,3; }
+    .char-null { font-size: 14px; font-weight: 700; fill: #a0522d; text-anchor: middle; dominant-baseline: middle;}
+
+    @media (prefers-color-scheme: dark) {
+      .frame, .cell { fill: #1e2330; stroke: #4a6fa5; }
+      .divider      { stroke: #4a6fa5; }
+      .val, .val-sm { fill: #e2e8f0; }
+      .idx          { fill: #8899aa; }
+      .link         { stroke: #4a6fa5; }
+      .link-fill    { fill: #4a6fa5; }
+      .ghost        { fill: #1e2330; stroke: #8899aa; }
+      .ghost-val    { fill: #aab4c0; }
+      .op           { fill: #8899aa; }
+      .op-arrow     { stroke: #8899aa; }
+      .op-arrow-fill{ fill: #8899aa; }
+      .top-label, .accent-label   { fill: #d4884a; }
+      .top-arrow, .accent-arrow   { stroke: #d4884a; }
+      .top-arrow-fill, .accent-arrow-fill { fill: #d4884a; }
+      .query { fill: #1e2330; stroke: #d4884a; }
+      .cell-null { fill: #2a1f10; stroke: #d4884a; }
+      .char-null { fill: #d4884a; }
+    }
+  </style>
+
+  <defs>
+    <marker id="arrow-link" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" class="link-fill" />
+    </marker>
+    <marker id="arrow-op" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" class="op-arrow-fill" />
+    </marker>
+    <marker id="arrow-accent" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" class="accent-arrow-fill" />
+    </marker>
+  </defs>
+
+  <!-- LÍNEAS DIVISORIAS DEL CUADRANTE -->
+  <line x1="550" y1="50" x2="550" y2="820" class="divider" stroke-dasharray="8,8" />
+  <line x1="50" y1="440" x2="1050" y2="440" class="divider" stroke-dasharray="8,8" />
+
+  <!-- TÍTULOS DE COLUMNAS (Variantes) -->
+  <text x="275" y="40" font-size="18" font-weight="bold" fill="#777777" text-anchor="middle">1. Separate Chaining</text>
+  <text x="825" y="40" font-size="18" font-weight="bold" fill="#777777" text-anchor="middle">2. Open Addressing (Linear Probing)</text>
+
+  <!-- ========================================================= -->
+  <!-- FILA 1: INSERCIÓN (Demostrando Clustering)                -->
+  <!-- ========================================================= -->
+  <text x="200" y="80" font-size="15" font-weight="bold" class="op" text-anchor="start">FASE 1: INSERCIÓN de "cain" con h("cain") = 5</text>
+
+  <!-- CUADRANTE 1: SC INSERCIÓN -->
+  <g transform="translate(180, 120)">
+    <rect x="50" y="0" width="100" height="240" class="cell" />
+    <line x1="50" y1="30" x2="150" y2="30" class="divider" /><line x1="50" y1="60" x2="150" y2="60" class="divider" />
+    <line x1="50" y1="90" x2="150" y2="90" class="divider" /><line x1="50" y1="120" x2="150" y2="120" class="divider" />
+    <line x1="50" y1="150" x2="150" y2="150" class="divider" /><line x1="50" y1="180" x2="150" y2="180" class="divider" />
+    <line x1="50" y1="210" x2="150" y2="210" class="divider" />
+    <text x="30" y="15" class="idx">0</text><text x="30" y="45" class="idx">1</text><text x="30" y="75" class="idx">2</text><text x="30" y="105" class="idx">3</text>
+    <text x="30" y="135" class="idx">4</text><text x="30" y="165" class="idx">5</text><text x="30" y="195" class="idx">6</text><text x="30" y="225" class="idx">7</text>
+
+    <!-- Datos existentes -->
+    <rect x="50" y="150" width="100" height="30" class="cell" /><text x="100" y="165" class="val">"abel"</text>
+    <rect x="50" y="180" width="100" height="30" class="cell" /><text x="100" y="195" class="val">"seth"</text>
+
+    <!-- Input Inserción -->
+    <rect x="-100" y="150" width="80" height="30" rx="4" class="query" /><text x="-60" y="165" class="val-sm">"cain"</text>
+    <path d="M -20 165 L 40 165" class="accent-arrow" marker-end="url(#arrow-accent)" />
+    
+    <!-- Encadenamiento -->
+    <path d="M 150 165 L 210 165" class="link" marker-end="url(#arrow-link)" />
+    <rect x="220" y="150" width="100" height="30" class="cell" rx="4" /><text x="270" y="165" class="val">"cain"</text>
+    <text x="270" y="115" class="op" text-anchor="start">1. Choca con ("abel")</text>
+    <text x="270" y="135" class="accent-label">2. Se enlaza en O(1)</text>
+  </g>
+
+  <!-- CUADRANTE 2: OA INSERCIÓN -->
+  <g transform="translate(680, 120)">
+    <rect x="50" y="0" width="100" height="240" class="cell" />
+    <line x1="50" y1="30" x2="150" y2="30" class="divider" /><line x1="50" y1="60" x2="150" y2="60" class="divider" />
+    <line x1="50" y1="90" x2="150" y2="90" class="divider" /><line x1="50" y1="120" x2="150" y2="120" class="divider" />
+    <line x1="50" y1="150" x2="150" y2="150" class="divider" /><line x1="50" y1="180" x2="150" y2="180" class="divider" />
+    <line x1="50" y1="210" x2="150" y2="210" class="divider" />
+    <text x="30" y="15" class="idx">0</text><text x="30" y="45" class="idx">1</text><text x="30" y="75" class="idx">2</text><text x="30" y="105" class="idx">3</text>
+    <text x="30" y="135" class="idx">4</text><text x="30" y="165" class="idx">5</text><text x="30" y="195" class="idx">6</text><text x="30" y="225" class="idx">7</text>
+
+    <!-- Datos existentes -->
+    <rect x="50" y="150" width="100" height="30" class="cell" /><text x="100" y="165" class="val">"abel"</text>
+    <rect x="50" y="180" width="100" height="30" class="cell" /><text x="100" y="195" class="val">"seth"</text>
+    
+    <!-- Elemento nuevo insertado -->
+    <rect x="50" y="210" width="100" height="30" class="query" /><text x="100" y="225" class="val">"cain"</text>
+
+    <!-- Input Inserción -->
+    <rect x="-100" y="150" width="80" height="30" rx="4" class="query" /><text x="-60" y="165" class="val-sm">"cain"</text>
+    <path d="M -20 165 L 40 165" class="accent-arrow" marker-end="url(#arrow-accent)" />
+
+    <!-- Flechas Probing con textos a la derecha -->
+    <path d="M 160 165 Q 190 180 160 195" class="op-arrow" marker-end="url(#arrow-op)" />
+    <text x="268" y="165" class="op" text-anchor="start">1. Choca con ("abel")</text>
+
+    <path d="M 160 195 Q 190 210 160 225" class="op-arrow" marker-end="url(#arrow-op)" />
+    <text x="310" y="195" class="op" text-anchor="start">2. Choca con ("seth") CLUSTERING</text>
+
+    <text x="248" y="225" class="accent-label" text-anchor="start">3. Inserta libre</text>
+  </g>
+
+  <!-- ========================================================= -->
+  <!-- FILA 2: BÚSQUEDA (Demostrando Tombstone)                  -->
+  <!-- ========================================================= -->
+  <text x="250" y="490" font-size="15" font-weight="bold" class="op" text-anchor="start">FASE 2: BÚSQUEDA de "cain" (simulando que se borró a "seth")</text>
+
+  <!-- CUADRANTE 3: SC BÚSQUEDA -->
+  <g transform="translate(180, 530)">
+    <rect x="50" y="0" width="100" height="240" class="cell" />
+    <line x1="50" y1="30" x2="150" y2="30" class="divider" /><line x1="50" y1="60" x2="150" y2="60" class="divider" />
+    <line x1="50" y1="90" x2="150" y2="90" class="divider" /><line x1="50" y1="120" x2="150" y2="120" class="divider" />
+    <line x1="50" y1="150" x2="150" y2="150" class="divider" /><line x1="50" y1="180" x2="150" y2="180" class="divider" />
+    <line x1="50" y1="210" x2="150" y2="210" class="divider" />
+    <text x="30" y="15" class="idx">0</text><text x="30" y="45" class="idx">1</text><text x="30" y="75" class="idx">2</text><text x="30" y="105" class="idx">3</text>
+    <text x="30" y="135" class="idx">4</text><text x="30" y="165" class="idx">5</text><text x="30" y="195" class="idx">6</text><text x="30" y="225" class="idx">7</text>
+
+    <rect x="50" y="150" width="100" height="30" class="cell" /><text x="100" y="165" class="val">"abel"</text>
+    
+    <!-- Input Búsqueda -->
+    <rect x="-100" y="150" width="80" height="30" rx="4" class="query" /><text x="-60" y="165" class="val-sm">"cain"</text>
+    <path d="M -20 165 L 40 165" class="accent-arrow" marker-end="url(#arrow-accent)" />
+    
+    <!-- Encadenamiento -->
+    <path d="M 150 165 L 210 165" class="link" marker-end="url(#arrow-link)" />
+    <rect x="220" y="150" width="100" height="30" class="cell" rx="4" /><text x="270" y="165" class="val">"cain"</text>
+    <text x="270" y="135" class="accent-label">Entra y recorre la lista</text>
+  </g>
+
+  <!-- CUADRANTE 4: OA BÚSQUEDA -->
+  <g transform="translate(680, 530)">
+    <rect x="50" y="0" width="100" height="240" class="cell" />
+    <line x1="50" y1="30" x2="150" y2="30" class="divider" /><line x1="50" y1="60" x2="150" y2="60" class="divider" />
+    <line x1="50" y1="90" x2="150" y2="90" class="divider" /><line x1="50" y1="120" x2="150" y2="120" class="divider" />
+    <line x1="50" y1="150" x2="150" y2="150" class="divider" /><line x1="50" y1="180" x2="150" y2="180" class="divider" />
+    <line x1="50" y1="210" x2="150" y2="210" class="divider" />
+    <text x="30" y="15" class="idx">0</text><text x="30" y="45" class="idx">1</text><text x="30" y="75" class="idx">2</text><text x="30" y="105" class="idx">3</text>
+    <text x="30" y="135" class="idx">4</text><text x="30" y="165" class="idx">5</text><text x="30" y="195" class="idx">6</text><text x="30" y="225" class="idx">7</text>
+
+    <!-- Datos existentes tras borrado -->
+    <rect x="50" y="150" width="100" height="30" class="cell" /><text x="100" y="165" class="val">"abel"</text>
+    <rect x="50" y="180" width="100" height="30" class="cell-null" /><text x="100" y="195" class="char-null">TOMBSTONE</text>
+    <rect x="50" y="210" width="100" height="30" class="cell" /><text x="100" y="225" class="val">"cain"</text>
+
+    <!-- Input Búsqueda -->
+    <rect x="-100" y="150" width="80" height="30" rx="4" class="query" /><text x="-60" y="165" class="val-sm">"cain"</text>
+    <path d="M -20 165 L 40 165" class="accent-arrow" marker-end="url(#arrow-accent)" />
+
+    <!-- Flechas Probing Búsqueda -->
+    <path d="M 160 165 Q 190 180 160 195" class="op-arrow" marker-end="url(#arrow-op)" />
+    <text x="268" y="165" class="op" text-anchor="start">1. Distinto a "cain"</text>
+
+    <path d="M 160 195 Q 190 210 160 225" class="accent-arrow" marker-end="url(#arrow-accent)" />
+    <text x="291" y="195" class="op" text-anchor="start">2. Lápida (Sigue el salto)</text>
+
+    <text x="248" y="225" class="accent-label" text-anchor="start">3. ¡Encontrado!</text>
+  </g>
+</svg>

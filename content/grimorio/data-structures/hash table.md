@@ -35,9 +35,6 @@ Permite búsquedas, inserciones y eliminaciones eficientes usando una función h
 - **Factor de carga controlado**:  
   La relación entre la cantidad de elementos almacenados y el tamaño de la tabla (load factor) debe mantenerse dentro de ciertos límites para preservar la eficiencia. Si se supera, se realiza un *rehashing*
 
-#### ¿Qué son las *colisiones*?
-Una **colisión** ocurre cuando dos claves distintas generan el mismo índice en la tabla hash. Es inevitable y debe resolverse con técnicas específicas.
-
 ### Representación
 ![Muestra](hashtable.svg)
 
@@ -52,6 +49,17 @@ Se implementa generalmente sobre **vectores unidimensionales**, aunque rara vez 
 
 - **Bucket**  
   Posición donde se guarda el elemento (valor), dependiendo del método de resolución de colisiones, este puede almacenar uno o más elementos
+
+#### ¿Qué son las *colisiones*?
+Una **colisión** ocurre cuando dos claves distintas generan el mismo índice en la tabla hash. Es inevitable y debe resolverse con técnicas específicas.
+
+Para resolver este problema, existen dos estrategias principales que administran la memoria de forma muy distinta:
+1. **Separate Chaining (Encadenamiento):** Utiliza estructuras dinámicas auxiliares (como listas enlazadas) fuera del vector principal.
+2. **Open Addressing (Direccionamiento Abierto):** Busca el siguiente espacio libre dentro del mismo vector (ej. *Linear Probing*), lo que ahorra punteros pero puede generar *clustering* (amontonamiento).
+
+A continuación, una comparativa visual de cómo ambas técnicas manejan la inserción y búsqueda frente a una colisión:
+
+![Comparativa entre Separate Chaining (encadenamiento) y Open Addressing (con clustering y uso de tombstones durante el probing)](resolucion-colisiones.svg)
 
 ## 2. Operaciones y complejidad
 
