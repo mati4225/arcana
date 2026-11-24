@@ -11,6 +11,8 @@ En un tablero de ajedrez de $n \times n$ casillas, un alfil puede desplazarse de
 
 **Problema:** Determinar si es posible que el alfil llegue desde una casilla inicial $(x, y)$ hasta una casilla destino $(u, v)$ sin atravesar obstáculos y, en caso afirmativo, calcular la menor cantidad de movimientos necesarios.
 
+Enunciado original: Olimpíada Informática Argentina, Certamen Nacional 2006, Nivel 3, Problema 2 ("Movimientos de un Alfil").
+
 ---
 
 ## Intuición
@@ -51,6 +53,20 @@ Consideremos un tablero pequeño de $4 \times 4$:
 
 Aunque `(4, 2)` y `(2, 4)` están en la misma diagonal, el obstáculo en `(3, 3)` bloquea el camino directo. El alfil debe rodearlo:
 
+<!--
+SVG PENDIENTE: content/attachments/bestiario/oia/alfil-ejemplo.svg
+(es la misma imagen para alfil.md, alfil-fuerza-bruta.md y alfil-branch-and-bound.md: se crea una sola vez)
+Qué mostrar: tablero de 4x4 con índices de fila y columna del 1 al 4 (fila 1 arriba).
+- Inicio "A" en (4,2), destino "O" en (2,4), obstáculo "X" en (3,3).
+- Recorrido óptimo con flechas numeradas 1, 2 y 3: (4,2) -> (3,1) -> (1,3) -> (2,4).
+- Diagonal directa bloqueada (4,2) -> (3,3) en línea punteada.
+- Casillas del otro color que el alfil, es decir con fila + columna impar, en gris: "descartadas".
+- Leyenda al costado y el resultado: "SI, 3 movimientos".
+Estilo: seguir content/attachments/illustration-style.css (SVG autocontenido, con modo claro y oscuro).
+Cuando el archivo exista, reemplazar este comentario por esta línea:
+![Tablero de 4x4 con el recorrido óptimo del alfil](alfil-ejemplo.svg)
+-->
+
 1. `(4, 2)` → `(3, 1)` *(1 movimiento)*
 2. `(3, 1)` → `(1, 3)` *(2 movimientos)*
 3. `(1, 3)` → `(2, 4)` *(3 movimientos)*
@@ -67,9 +83,11 @@ Una primera aproximación directa es aplicar **fuerza bruta**, probando todos lo
 
 Para escalar a tableros grandes ($n \le 1000$), resulta necesario descartar ramas inútiles a medida que se explora, aplicando **Branch and Bound** (ramificación y poda) con una cota inferior simple basada en la geometría del tablero.
 
+Conviene pensar el tablero como un [[graph]]: cada casilla libre es un vértice y hay una arista entre dos casillas si el alfil pasa de una a la otra en un solo movimiento. Como todos los movimientos "cuestan" lo mismo, la respuesta es el camino con menos aristas entre el inicio y el destino.
+
 ---
 
 ## Soluciones disponibles
 
-- [[alfil-fuerza-bruta]]
-- [[alfil-branch-and-bound]]
+- [[alfil-fuerza-bruta]]: prueba todos los caminos posibles. Exponencial; sirve para tableros de hasta 5×5.
+- [[alfil-branch-and-bound]]: explora primero los estados con menor cota y poda los que no pueden mejorar. Polinomial; resuelve tableros de 1000×1000.

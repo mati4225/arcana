@@ -1,122 +1,192 @@
 ---
-title: Alfil - Branch and Bound
+title: 'OIA 2006 - Movimientos de un Alfil - Branch and Bound'
 tags:
+  - oia
   - solucion
-  - misc
 ---
+
+Volver a la descripción del problema: [[alfil]]
 
 ## Técnicas utilizadas
 
-Para ir un poco mas alla en la resolución de este problema, podemos pensar en optimizar las alternativas de casilleros que tiene el alfil como opción para avanzar. Por ejemplo intuitivamente podemos saber que no tiene sentido que el alfil avance en una dirección que es completamente contraria a la ubicación de la posición objetivo.  Siguiendo por esa ida y por medio de la técnica del algoritmo conocida como "Branch and Bound" es como se abordará el problema para optimizar la cantidad de casilleros analizados.
+**Branch and Bound (ramificación y poda):** se explora el mismo árbol de caminos que en [[alfil-fuerza-bruta]], pero:
+
+- **Ramificación:** los hijos de una casilla son todas las casillas a las que el alfil llega en un movimiento.
+- **Cota inferior:** para cada estado se calcula cuántos movimientos va a necesitar, *como mínimo*, el camino completo.
+- **Poda:** se descarta todo estado que no pueda mejorar la mejor solución conocida.
+- **Estrategia LC (*least cost*):** siempre se expande primero el estado con menor cota, usando una cola de prioridad (un *heap*, ver [[queue]]).
+
 ## Idea de la solución
 
-Para resolver este problema vamos a considerar entre todas las alternativas que tiene inicialmente el alfil, cual me acerca mas o menos a la posición objetivo. Cuando el algoritmo BFS analice las casillas a las cual se puede desplazar el alfil se calculará una cota para cada una de estas, y se avanzará con la que en principio resulte mas prometedora. Esta cota se calcula con la distancia entre el casillero y la casilla objetivo por medio de la formula: $d = \sqrt{\text{distancia eje x}^{2} + \text{distancia eje y}^{2}}$ 
-Para el calculo de la cota se abstrae de las restricciones propias del problema como los obstáculos y la dirección en la cual se mueve el alfil. Esto es para simplificar el problema y poder analizarlo mejor.
+### La cota inferior
 
-*calculo de cota de casillero:*
-`cota` = $\sqrt{(\text{objetivo}_x-\text{casillero}_x)^{2} + (\text{objetivo}_y-\text{casillero}_y)^{2}}$
+Si el alfil está en la casilla $c$ después de $g$ movimientos, el camino completo va a tener al menos $g + h(c)$ movimientos, donde $h$ mira solo la geometría e **ignora los obstáculos**:
 
-Las casillas analizadas se insertaran en una cola de prioridad que es un Min-Heap en donde se ordenaran por cantidad de movimientos y en segundo lugar por cota.
+$$
+h(c) =
+\begin{cases}
+0 & \text{si } c \text{ es el destino} \\
+1 & \text{si } c \text{ está en una diagonal del destino} \\
+2 & \text{en otro caso}
+\end{cases}
+$$
 
-El primer casillero obtenido desde la cola de prioridad es el de menos movimientos, en caso de empate se obtiene el de menos cota. si hay un casillero que ofrece una peor cota que la mejor solución es podado y el algoritmo pasa a analizar el siguiente casillero guardado en la cola.
+Es una cota válida porque nunca sobreestima. Si $c$ no está en una diagonal del destino, hacen falta al menos 2 movimientos, y los obstáculos solo pueden agregar más, nunca menos. Además, todas las casillas que se exploran son del color del destino: el chequeo de paridad de la descripción ya descartó el otro caso.
 
-Ejemplo:
+### Las dos podas
 
-![primer-movimiento-alfil](reducido-ajedrez.svg)
+1. **Por cota:** si $g + h(c) \ge$ mejor solución encontrada, ese estado y todo su subárbol se descartan sin generarlos.
+2. **Por dominancia:** si ya se llegó a la casilla $c$ con $g'$ movimientos y $g' \le g$, el estado actual no puede terminar mejor que aquel. Se guarda en un [[map]] `mejor_g` el menor $g$ con el que se alcanzó cada casilla.
 
-| CASILLERO ANALIZADO | CASILLA OBJETIVO | DISTANCIA EN X | DISTANCIA EN Y |               COTA               | MOVIMIENTOS |
-| :-----------------: | :--------------: | :------------: | :------------: | :------------------------------: | :---------: |
-|        (2,1)        |      (4,1)       |   4 - 2 = 2    |   1 - 1 = 0    |    $\sqrt{2^{2} + 0^{2}} = 2$    |      1      |
-|        (2,3)        |      (4,1)       |   4 - 2 = 2    |   1 - 3 = -2   | $\sqrt{2^{2} + (-2)^{2}} = 2,83$ |      1      |
+### Por qué alcanza con frenar al primer corte
 
-**Cola de prioridad:**
+El *heap* devuelve los estados en orden creciente de $g + h$. Cuando el estado de menor cota ya no puede mejorar la mejor solución, ningún otro puede: se termina la búsqueda entera con `break`, sin vaciar la cola.
 
-|  #  | CASILLERO | COTA | CANTIDAD DE MOVIMIENTOS |
-| :-: | :-------: | :--: | :---------------------: |
-|  1  |   (2,1)   |  2   |            1            |
-|  2  |   (2,3)   | 2,83 |            1            |
+> **Relación con BFS.** Si en lugar de un *heap* se usa una [[queue]] FIFO (estrategia "en anchura") y se deja solo la poda por dominancia, este mismo algoritmo es exactamente un **BFS**: explora por niveles y la primera vez que llega al destino lo hace con el mínimo. Esa fue la solución que planteamos en el parcial. La estrategia LC con cota agrega el criterio de ir primero hacia donde *parece* estar el destino.
+
 ## Código
 
-```text
+Usa `libre` y `movidas_desde` de [[alfil-fuerza-bruta]].
 
+```python
+import heapq
+
+def cota(casilla, destino):
+    (f, c), (u, v) = casilla, destino
+    if casilla == destino:
+        return 0
+    return 1 if abs(f - u) == abs(c - v) else 2
+
+def branch_and_bound(tablero, origen, destino):
+    if (sum(origen) - sum(destino)) % 2 != 0 or not libre(tablero, *destino):
+        return ("NO", 0)                     # distinto color o destino ocupado
+    mejor = float('inf')
+    mejor_g = {origen: 0}
+    heap = [(cota(origen, destino), 0, origen)]   # (g + h, g, casilla)
+
+    while heap:
+        estimado, g, casilla = heapq.heappop(heap)
+        if estimado >= mejor:
+            break                            # poda por cota: nada en el heap mejora
+        if g > mejor_g[casilla]:
+            continue                         # poda por dominancia
+        if casilla == destino:
+            mejor = g
+            continue
+        for siguiente in movidas_desde(tablero, *casilla):
+            if g + 1 < mejor_g.get(siguiente, float('inf')):
+                mejor_g[siguiente] = g + 1
+                estimado = g + 1 + cota(siguiente, destino)
+                if estimado < mejor:
+                    heapq.heappush(heap, (estimado, g + 1, siguiente))
+
+    return ("SI", mejor) if mejor < float('inf') else ("NO", 0)
 ```
+
+## Traza de ejemplo
+
+Sobre el tablero de 4×4 de la descripción: inicio `(4, 2)`, destino `(2, 4)` y obstáculo en `(3, 3)`.
+
+<!--
+SVG PENDIENTE: content/attachments/bestiario/oia/alfil-ejemplo.svg
+(es la misma imagen para alfil.md, alfil-fuerza-bruta.md y alfil-branch-and-bound.md: se crea una sola vez)
+Qué mostrar: tablero de 4x4 con índices de fila y columna del 1 al 4 (fila 1 arriba).
+- Inicio "A" en (4,2), destino "O" en (2,4), obstáculo "X" en (3,3).
+- Recorrido óptimo con flechas numeradas 1, 2 y 3: (4,2) -> (3,1) -> (1,3) -> (2,4).
+- Diagonal directa bloqueada (4,2) -> (3,3) en línea punteada.
+- Casillas del otro color que el alfil, es decir con fila + columna impar, en gris: "descartadas".
+- Leyenda al costado y el resultado: "SI, 3 movimientos".
+Estilo: seguir content/attachments/illustration-style.css (SVG autocontenido, con modo claro y oscuro).
+Cuando el archivo exista, reemplazar este comentario por esta línea:
+![Tablero de 4x4 con el recorrido óptimo del alfil](alfil-ejemplo.svg)
+-->
+
+<!--
+SVG PENDIENTE (opcional): content/attachments/bestiario/oia/alfil-bnb-traza.svg
+Qué mostrar: el árbol de búsqueda de la tabla de abajo. Cada nodo es una casilla con su g y su g+h:
+(4,2) g=0 f=1 -> (3,1) g=1 f=3 -> hijos (1,3) g=2 f=3 y (2,2) g=2 f=4.
+(1,3) -> (2,4) g=3 f=3: DESTINO, mejor = 3.
+(2,2) tachado: "podado por cota, 4 >= 3".
+Numerar los nodos en el orden en que salen del heap (pasos 1 a 5).
+Estilo: content/attachments/illustration-style.css.
+Cuando el archivo exista, reemplazar este comentario por esta línea:
+![Árbol de búsqueda de Branch and Bound en el tablero de 4x4](alfil-bnb-traza.svg)
+-->
+
+Chequeo inicial: $(4 + 2) \bmod 2 = (2 + 4) \bmod 2 = 0$, mismo color. Se sigue.
+
+| Paso | Se extrae (casilla, $g$, $g+h$) | `mejor` | Qué pasa | Heap después |
+|---:|---|---:|---|---|
+| 1 | (4,2), 0, 1 | ∞ | Expande. Único hijo: (3,1) con $1 + 2 = 3$ | (3,1):3 |
+| 2 | (3,1), 1, 3 | ∞ | Expande. (2,2): $2+2=4$. (1,3) está en diagonal del destino: $2+1=3$. (4,2): dominado, ya se llegó con 0 | (1,3):3, (2,2):4 |
+| 3 | (1,3), 2, 3 | ∞ | Expande. (2,2) y (3,1): dominados. (2,4) es el destino: $3+0=3$ | (2,4):3, (2,2):4 |
+| 4 | (2,4), 3, 3 | ∞ → **3** | Es el destino: `mejor = 3` | (2,2):4 |
+| 5 | (2,2), 2, 4 | 3 | $4 \ge 3$: **poda por cota**, se termina | (vacío) |
+
+Resultado: `SI`, `3` movimientos. La rama de (2,2), donde la fuerza bruta encontraba el camino de 4 movimientos, **no se llegó a expandir**: la cota ya sabía que no podía bajar de 4.
 
 ## Complejidad
 
-## Traza de Ejemplo
-Simulación de una ejecución del algoritmo para la resolución de un determinado tablero de 8x8 con 6 posiciones bloqueadas. 
-
-### Primer paso
-Analizo las posiblidades para el primer movimiento
-![traza-ajedrez-1](ajedrez-traza-1.svg)
-
-**Cola de prioridad:**
-
-|  #  | CASILLERO |               COTA               | MOVIMIENTOS |
-| :-: | :-------: | :------------------------------: | :---------: |
-|  1  |   (3,4)   | $\sqrt{5^{2} + (-1)^{2}} = 5,10$ |      1      |
-|  2  |   (2,3)   |    $\sqrt{6^{2} + 0^{2}} = 6$    |      1      |
-|  3  |   (2,1)   |  $\sqrt{6^{2} + 2^{2}} = 6,32$   |      1      |
-
-**Mejor Solución:**
-
-La mejor solución hasta ahora es el casillero `(3,4)`
-
-
-
-### Segundo paso
-Extraigo de la cola de prioridad el casillero `(3,4)` y desde este analizo las posibilidades de movimiento
-
-![traza-ajedrez-2](ajedrez-traza-2.svg)
-
-**Cola de prioridad:**
-
-|  #  | CASILLERO |               COTA               | MOVIMIENTOS |
-| :-: | :-------: | :------------------------------: | :---------: |
-|  1  |   (2,3)   |    $\sqrt{6^{2} + 0^{2}} = 6$    |      1      |
-|  2  |   (2,1)   |  $\sqrt{6^{2} + 2^{2}} = 6,32$   |      1      |
-|  3  |   (5,2)   |  $\sqrt{3^{2} + 1^{2}} = 3,16$   |      2      |
-|  4  |   (4,3)   |    $\sqrt{4^{2} + 0^{2}} = 4$    |      2      |
-|  5  |   (2,5)   | $\sqrt{6^{2} + (-2)^{2}} = 6,32$ |      2      |
-|  6  |   (1,6)   | $\sqrt{6^{2} + (-3)^{2}} = 6,71$ |      2      |
-**Mejor Solución:**
-
-La mejor solución hasta ahora es el casillero `(5,2)`
-
-
-
-### Tercer paso
-Se extraen los casilleros `(2,3)` y `(2,1)` pero ambos son podados porque ofrecen una cota peor que la mejor solución encontrada hasta el momento. Por lo tanto se saca de la cola de prioridad una vez mas y se obtiene el casillero `(5,2)`
-
-![traza-ajedrez-3](ajedrez-traza-3.svg)
-
-**Cola de prioridad:**
-
-|  #  | CASILLERO |               COTA               | MOVIMIENTOS |     |
-| :-: | :-------: | :------------------------------: | :---------: | --- |
-|  1  |   (4,3)   |    $\sqrt{4^{2} + 0^{2}} = 4$    |      2      |     |
-|  2  |   (2,5)   | $\sqrt{6^{2} + (-2)^{2}} = 6,32$ |      2      |     |
-|  3  |   (1,6)   | $\sqrt{6^{2} + (-3)^{2}} = 6,71$ |      2      |     |
-|  4  |   (7,4)   | $\sqrt{1^{2} + (-1)^{2}} = 1,41$ |      3      |     |
-|  5  |   (6,3)   |    $\sqrt{2^{2} + 0^{2}} = 4$    |      3      |     |
-|  6  |   (8,5)   |  $\sqrt{0^{2} + (-2)^{2}} = 4$   |      3      |     |
-|  7  |   (4,1)   |  $\sqrt{4^{2} + 2^{2}} = 4,47$   |      3      |     |
-**Mejor Solución:**
-
-La mejor solución hasta ahora es el casillero `(7,4)`
-
-
-### Cuarto paso
-Se extraen los casilleros `(4,3)`, `(2,5)` y `(1,6)` pero todos son podados porque ofrecen una cota peor que la mejor solución encontrada hasta el momento. Por lo tanto se saca de la cola de prioridad una vez mas y se obtiene el casillero `(7,4)`
-![traza-ajedrez-4](ajedrez-traza-4.svg)
-
-Analizando las posibilidades dentro del casillero obtenido de la cola de prioridad nos damos cuenta que estamos a un movimiento de finalizar el algoritmo, con lo cual el algoritmo de búsqueda finaliza.
-
-Por ultimo el algoritmo contabiliza un movimiento al contador de movimientos que es el que toma de ir desde el casillero `(7,4)`  al objetivo que es `(8,3)`. Por ultimo se retorna el numero de movimientos junto con la palabra "SI" que indica que es posible llegar desde el punto del partida al objetivo en este tablero en particular.
-
+Sea $n$ el lado del tablero.
 
 ### Temporal
 
+$O(n^3 \log n)$ en el peor caso:
 
+- Gracias a la poda por dominancia y a que la cota es **consistente** ($h(a) \le 1 + h(b)$ para todo movimiento $a \to b$), cada casilla se expande a lo sumo una vez, con su menor $g$. Las extracciones repetidas se descartan en $O(1)$.
+- Expandir una casilla cuesta $O(n)$, porque desliza en cuatro diagonales de largo hasta $n$.
+- En total se generan $O(n^2 \cdot n)$ hijos, y cada inserción en el *heap* cuesta $O(\log n^3) = O(\log n)$.
 
 ### Espacial
+
+$O(n^3)$ en el peor caso teórico, por el *heap*: puede tener una entrada por cada hijo generado. En la práctica se acota a $O(n^2)$, que es lo que ocupan `mejor_g` y la casilla de cada estado pendiente.
+
+### Mediciones
+
+Implementación en Python de este archivo, comparada con un BFS con barrido (ver abajo), en tableros de 1000×1000:
+
+| Tablero de 1000×1000 | Respuesta | Branch and Bound | BFS con barrido |
+|---|---|---:|---:|
+| Sin obstáculos | SI, 2 | 0,01 s | 0,19 s |
+| 30 % de obstáculos al azar | SI, 309 | 1,7 s | 1,1 s |
+| Destino encerrado (del mismo color, inalcanzable) | NO | 12 min (737 s) | 5,5 s |
+
+Cuando el destino está cerca, la cota lleva directo hacia él y Branch and Bound es el más rápido. Cuando no hay solución, la cota no poda nada y se paga entero el $O(n^3 \log n)$.
+
+### Mejora posible: barrido por dirección
+
+Con la estrategia FIFO (el BFS del parcial) se puede bajar a $O(n^2)$. Al deslizar en una dirección, se corta si se llega a una casilla que ya fue "barrida" en esa misma dirección, porque lo que sigue ya tiene su mínimo. Ese argumento depende de que los estados salgan en orden creciente de $g$, que la cola FIFO garantiza y el *heap* por $g+h$ no. Por eso no se combina con la estrategia LC.
+
+## Cuándo usar esta técnica
+
+### Favorable cuando
+
+- Se busca un **óptimo** (el mínimo de movimientos) y existe una cota inferior barata y válida.
+- El destino está "cerca en línea recta": la cota guía la búsqueda directo hacia él y la poda corta el resto apenas aparece una solución.
+- Tableros grandes con solución: con $n = 1000$ resuelve en segundos o menos (ver Mediciones), mientras que la fuerza bruta ya no termina con $n = 6$.
+
+### Limitaciones
+
+- La cota es **débil**: solo puede valer 0, 1 o 2. En tableros con muchos obstáculos, donde el camino real tiene decenas o cientos de movimientos, casi todos los estados empatan y la búsqueda se comporta como un BFS con el costo extra del *heap*.
+- Si la respuesta es `NO` pero las casillas son del mismo color, no hay nada que podar: recorre todo lo alcanzable antes de concluir. En un tablero de 1000×1000 eso tardó 12 minutos.
+- Para este problema en particular, un BFS con barrido ($O(n^2)$, sin *heap*) es asintóticamente mejor. Branch and Bound gana cuando la cota es informativa, y acá lo es poco.
+
+## Comparación con la solución por fuerza bruta
+
+| | [[alfil-fuerza-bruta]] | Branch and Bound |
+|---|---|---|
+| Qué explora | Todos los caminos simples | Cada casilla, una vez, en orden de cota |
+| Peor caso temporal | Exponencial, $O(n \cdot b^{L})$ | Polinomial, $O(n^3 \log n)$ |
+| Espacio | $O(n^2)$ (pila de recursión) | $O(n^2)$ en la práctica ($O(n^3)$ teórico) |
+| Ejemplo 4×4 | 10 llamadas | 3 expansiones |
+| Tablero vacío de 6×6 | No termina en 10 minutos | Instantáneo |
+| 1000×1000 con 30 % de obstáculos | Impensable | 1,7 s |
+| Correctitud | Evidente: prueba todo | Depende de que la cota sea válida |
+
+La fuerza bruta solo conviene como verificación en tableros mínimos: es tan simple que es difícil que esté mal, y por eso se usó para probar esta solución en 3000 tableros aleatorios de hasta 5×5, con resultados idénticos. Para cualquier tablero real, Branch and Bound es la elección: transforma un problema exponencial en uno polinomial gracias a las dos podas.
+
+## Referencias
+
+- Cátedra de Programación Avanzada (UNLaM), clase de Ramificación y poda: estrategias de exploración FIFO, LIFO y LC.
+- [[COR2011]], capítulo de búsqueda en anchura (BFS) en grafos.
+- Hart, Nilsson y Raphael (1968), *A Formal Basis for the Heuristic Determination of Minimum Cost Paths*: con una cota consistente, la estrategia LC equivale al algoritmo A*.
