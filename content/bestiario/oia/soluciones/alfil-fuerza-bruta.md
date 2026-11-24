@@ -78,18 +78,7 @@ Cuando el archivo exista, reemplazar este comentario por esta línea:
 ![Tablero de 4x4 con el recorrido óptimo del alfil](alfil-ejemplo.svg)
 -->
 
-<!--
-SVG PENDIENTE (opcional): content/attachments/bestiario/oia/alfil-fb-arbol.svg
-Qué mostrar: el mismo árbol de llamadas del bloque de texto de abajo, dibujado como árbol (raíz arriba).
-- 10 nodos, cada uno con su casilla y sus movimientos: (4,2) m=0 -> (3,1) m=1 -> se abre en dos ramas, (2,2) m=2 y (1,3) m=2.
-- Rama (2,2): hijos (1,1) m=3 (hoja sin salida) y (1,3) m=3 -> (2,4) m=4 DESTINO, "mejor = 4".
-- Rama (1,3): hijos (2,2) m=3 -> (1,1) m=4 (hoja sin salida) y (2,4) m=3 DESTINO, "mejor = 3".
-- Resaltar los dos nodos destino con el color de acento y marcar el de 3 como el óptimo.
-- Numerar los nodos en el orden de las llamadas (1 a 10), igual que la tabla de abajo.
-Estilo: content/attachments/illustration-style.css (SVG autocontenido, con modo claro y oscuro).
-Cuando el archivo exista, reemplazar este comentario por esta línea (el árbol de texto puede quedar o borrarse):
 ![Árbol de llamadas de la fuerza bruta en el tablero de 4x4](alfil-fb-arbol.svg)
--->
 
 Árbol de llamadas completo (cada nivel de sangría es un movimiento más):
 
@@ -140,16 +129,7 @@ Lo que se mide al correrlo, de esquina a esquina en un tablero **sin obstáculos
 
 Paradójicamente, el tablero vacío es el peor caso: sin obstáculos hay muchísimos más caminos para enumerar, aunque la respuesta sea siempre 1 o 2.
 
-<!--
-SVG PENDIENTE (opcional): content/attachments/bestiario/oia/alfil-fb-crecimiento.svg
-Qué mostrar: gráfico de barras con las llamadas recursivas de la tabla de arriba, de esquina a esquina en tablero vacío.
-- Eje X: 3x3, 4x4, 5x5 y 6x6. Eje Y: cantidad de llamadas, en escala logarítmica (si no, 8 y 110 no se ven).
-- Valores: 8, 110, 27.408 y, para 6x6, una barra que se sale del gráfico con la etiqueta "no terminó en 10 minutos".
-- Cada barra con su número escrito encima.
-Estilo: content/attachments/illustration-style.css (SVG autocontenido, con modo claro y oscuro).
-Cuando el archivo exista, reemplazar este comentario por esta línea:
 ![Crecimiento de las llamadas de la fuerza bruta según el tamaño del tablero](alfil-fb-crecimiento.svg)
--->
 
 ### Espacial
 

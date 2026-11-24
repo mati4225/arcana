@@ -1,0 +1,61 @@
+<svg width="600" height="380" viewBox="0 0 600 380" xmlns="http://www.w3.org/2000/svg">
+  <title>Crecimiento de las llamadas de la fuerza bruta según el tamaño del tablero</title>
+  <style>
+    text { font-family: 'Courier New', Courier, monospace; }
+    .cell         { fill: #f5f7fa; stroke: #9baec8; stroke-width: 1.5; }
+    .divider      { stroke: #9baec8; stroke-width: 1; stroke-dasharray: 3,4; }
+    .axis         { stroke: #9baec8; stroke-width: 1.5; }
+    .val-sm       { font-size: 15px; font-weight: 700; fill: #1a1a2e; text-anchor: middle; }
+    .idx          { font-size: 12px; fill: #777777; text-anchor: end; }
+    .op           { font-size: 13px; font-weight: 700; fill: #777777; text-anchor: middle; }
+    .ghost        { fill: #f5f7fa; fill-opacity: 0.5; stroke: #777777; stroke-width: 1.5; stroke-dasharray: 4,3; }
+    .accent-label { font-size: 13px; font-weight: 700; fill: #c0742a; text-anchor: middle; }
+    .accent-arrow { stroke: #c0742a; stroke-width: 1.8; fill: none; }
+    .accent-arrow-fill { fill: #c0742a; }
+    @media (prefers-color-scheme: dark) {
+      .cell         { fill: #1e2330; stroke: #4a6fa5; }
+      .divider      { stroke: #4a6fa5; }
+      .axis         { stroke: #4a6fa5; }
+      .val-sm       { fill: #e2e8f0; }
+      .idx          { fill: #8899aa; }
+      .op           { fill: #8899aa; }
+      .ghost        { fill: #1e2330; stroke: #8899aa; }
+      .accent-label { fill: #d4884a; }
+      .accent-arrow { stroke: #d4884a; }
+      .accent-arrow-fill { fill: #d4884a; }
+    }
+  </style>
+
+  <text x="82" y="324" class="idx">1</text>
+  <line x1="90" y1="270" x2="560" y2="270" class="divider"/>
+  <text x="82" y="274" class="idx">10</text>
+  <line x1="90" y1="220" x2="560" y2="220" class="divider"/>
+  <text x="82" y="224" class="idx">100</text>
+  <line x1="90" y1="170" x2="560" y2="170" class="divider"/>
+  <text x="82" y="174" class="idx">1.000</text>
+  <line x1="90" y1="120" x2="560" y2="120" class="divider"/>
+  <text x="82" y="124" class="idx">10.000</text>
+  <line x1="90" y1="70" x2="560" y2="70" class="divider"/>
+  <text x="82" y="74" class="idx">100.000</text>
+  <line x1="90" y1="320" x2="560" y2="320" class="axis"/>
+  <line x1="90" y1="320" x2="90" y2="60" class="axis"/>
+  <text x="20" y="195.0" class="op" transform="rotate(-90 20 195.0)">llamadas (escala log)</text>
+  <rect x="120.0" y="274.8" width="60" height="45.2" class="cell"/>
+  <rect x="138.2" y="250.8" width="23.5" height="22" rx="4" class="cell"/>
+  <text x="150" y="266.8" class="val-sm">8</text>
+  <text x="150" y="342" class="op">3×3</text>
+  <rect x="230.0" y="217.9" width="60" height="102.1" class="cell"/>
+  <rect x="238.8" y="193.9" width="42.5" height="22" rx="4" class="cell"/>
+  <text x="260" y="209.9" class="val-sm">110</text>
+  <text x="260" y="342" class="op">4×4</text>
+  <rect x="340.0" y="98.1" width="60" height="221.9" class="cell"/>
+  <rect x="334.5" y="74.1" width="71.0" height="22" rx="4" class="cell"/>
+  <text x="370" y="90.1" class="val-sm">27.408</text>
+  <text x="370" y="342" class="op">5×5</text>
+  <rect x="450.0" y="48" width="60" height="272" class="ghost"/>
+  <line x1="480" y1="78" x2="480" y2="42" class="accent-arrow"/>
+  <polygon points="474,44 486,44 480,34" class="accent-arrow-fill"/>
+  <text x="480" y="26" class="accent-label">no terminó en 10 minutos</text>
+  <text x="480" y="342" class="op">6×6</text>
+  <text x="325.0" y="368" class="op">tablero vacío, de esquina a esquina</text>
+</svg>

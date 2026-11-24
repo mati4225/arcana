@@ -1,0 +1,98 @@
+<svg width="600" height="425" viewBox="0 0 600 425" xmlns="http://www.w3.org/2000/svg">
+  <title>Árbol de llamadas de la fuerza bruta en el tablero de 4x4</title>
+  <style>
+    text { font-family: 'Courier New', Courier, monospace; }
+    .frame        { fill: #f5f7fa; stroke: #9baec8; stroke-width: 1.5; }
+    .val-sm       { font-size: 15px; font-weight: 700; fill: #1a1a2e; text-anchor: middle; }
+    .idx          { font-size: 12px; fill: #777777; text-anchor: middle; }
+    .link         { stroke: #9baec8; stroke-width: 1.8; fill: none; }
+    .op           { font-size: 12px; font-weight: 700; fill: #777777; text-anchor: middle; }
+    .accent-label { font-size: 13px; font-weight: 700; fill: #c0742a; text-anchor: middle; }
+    .accent-arrow { stroke: #c0742a; stroke-width: 1.8; fill: none; }
+    .query        { fill: #f5f7fa; stroke: #c0742a; stroke-width: 1.8; }
+    .query-best   { stroke-width: 3; }
+    .badge        { fill: #9baec8; }
+    .badge-accent { fill: #c0742a; }
+    .badge-num    { font-size: 11px; font-weight: 700; fill: #ffffff; text-anchor: middle; }
+    @media (prefers-color-scheme: dark) {
+      .frame        { fill: #1e2330; stroke: #4a6fa5; }
+      .val-sm       { fill: #e2e8f0; }
+      .idx          { fill: #8899aa; }
+      .link         { stroke: #4a6fa5; }
+      .op           { fill: #8899aa; }
+      .accent-label { fill: #d4884a; }
+      .accent-arrow { stroke: #d4884a; }
+      .query        { fill: #1e2330; stroke: #d4884a; }
+      .badge        { fill: #4a6fa5; }
+      .badge-accent { fill: #d4884a; }
+      .badge-num    { fill: #1a1a2e; }
+    }
+  </style>
+
+  <line x1="300" y1="63" x2="300" y2="97" class="accent-arrow"/>
+  <line x1="300" y1="143" x2="145" y2="177" class="link"/>
+  <line x1="145" y1="223" x2="80" y2="257" class="link"/>
+  <line x1="145" y1="223" x2="210" y2="257" class="link"/>
+  <line x1="210" y1="303" x2="210" y2="337" class="link"/>
+  <line x1="300" y1="143" x2="455" y2="177" class="accent-arrow"/>
+  <line x1="455" y1="223" x2="390" y2="257" class="link"/>
+  <line x1="390" y1="303" x2="390" y2="337" class="link"/>
+  <line x1="455" y1="223" x2="520" y2="257" class="accent-arrow"/>
+  <rect x="250" y="17" width="100" height="46" rx="6" class="frame"/>
+  <text x="300" y="38" class="val-sm">(4,2)</text>
+  <text x="300" y="55" class="idx">m=0</text>
+  <circle cx="250" cy="17" r="10" class="badge"/>
+  <text x="250" y="21" class="badge-num">1</text>
+  <rect x="250" y="97" width="100" height="46" rx="6" class="frame"/>
+  <text x="300" y="118" class="val-sm">(3,1)</text>
+  <text x="300" y="135" class="idx">m=1</text>
+  <circle cx="250" cy="97" r="10" class="badge"/>
+  <text x="250" y="101" class="badge-num">2</text>
+  <rect x="95" y="177" width="100" height="46" rx="6" class="frame"/>
+  <text x="145" y="198" class="val-sm">(2,2)</text>
+  <text x="145" y="215" class="idx">m=2</text>
+  <circle cx="95" cy="177" r="10" class="badge"/>
+  <text x="95" y="181" class="badge-num">3</text>
+  <rect x="30" y="257" width="100" height="46" rx="6" class="frame"/>
+  <text x="80" y="278" class="val-sm">(1,1)</text>
+  <text x="80" y="295" class="idx">m=3</text>
+  <circle cx="30" cy="257" r="10" class="badge"/>
+  <text x="30" y="261" class="badge-num">4</text>
+  <text x="80" y="320" class="op">sin salida</text>
+  <rect x="160" y="257" width="100" height="46" rx="6" class="frame"/>
+  <text x="210" y="278" class="val-sm">(1,3)</text>
+  <text x="210" y="295" class="idx">m=3</text>
+  <circle cx="160" cy="257" r="10" class="badge"/>
+  <text x="160" y="261" class="badge-num">5</text>
+  <rect x="160" y="337" width="100" height="46" rx="6" class="query"/>
+  <text x="210" y="358" class="val-sm">(2,4)</text>
+  <text x="210" y="375" class="idx">m=4</text>
+  <circle cx="160" cy="337" r="10" class="badge-accent"/>
+  <text x="160" y="341" class="badge-num">6</text>
+  <text x="210" y="400" class="accent-label">DESTINO</text>
+  <text x="210" y="416" class="op">mejor = 4</text>
+  <rect x="405" y="177" width="100" height="46" rx="6" class="frame"/>
+  <text x="455" y="198" class="val-sm">(1,3)</text>
+  <text x="455" y="215" class="idx">m=2</text>
+  <circle cx="405" cy="177" r="10" class="badge"/>
+  <text x="405" y="181" class="badge-num">7</text>
+  <rect x="340" y="257" width="100" height="46" rx="6" class="frame"/>
+  <text x="390" y="278" class="val-sm">(2,2)</text>
+  <text x="390" y="295" class="idx">m=3</text>
+  <circle cx="340" cy="257" r="10" class="badge"/>
+  <text x="340" y="261" class="badge-num">8</text>
+  <rect x="340" y="337" width="100" height="46" rx="6" class="frame"/>
+  <text x="390" y="358" class="val-sm">(1,1)</text>
+  <text x="390" y="375" class="idx">m=4</text>
+  <circle cx="340" cy="337" r="10" class="badge"/>
+  <text x="340" y="341" class="badge-num">9</text>
+  <text x="390" y="400" class="op">sin salida</text>
+  <rect x="470" y="257" width="100" height="46" rx="6" class="query query-best"/>
+  <text x="520" y="278" class="val-sm">(2,4)</text>
+  <text x="520" y="295" class="idx">m=3</text>
+  <circle cx="470" cy="257" r="10" class="badge-accent"/>
+  <text x="470" y="261" class="badge-num">10</text>
+  <text x="520" y="320" class="accent-label">DESTINO</text>
+  <text x="520" y="336" class="accent-label">mejor = 3 (óptimo)</text>
+  <text x="372" y="124" class="op" style="text-anchor: start">(3,3) es obstáculo</text>
+</svg>
