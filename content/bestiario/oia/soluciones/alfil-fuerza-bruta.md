@@ -64,19 +64,7 @@ def fuerza_bruta(tablero, origen, destino):
 
 Sobre el tablero de 4×4 de la descripción: inicio `(4, 2)`, destino `(2, 4)` y obstáculo en `(3, 3)`.
 
-<!--
-SVG PENDIENTE: content/attachments/bestiario/oia/alfil-ejemplo.svg
-(es la misma imagen para alfil.md, alfil-fuerza-bruta.md y alfil-branch-and-bound.md: se crea una sola vez)
-Qué mostrar: tablero de 4x4 con índices de fila y columna del 1 al 4 (fila 1 arriba).
-- Inicio "A" en (4,2), destino "O" en (2,4), obstáculo "X" en (3,3).
-- Recorrido óptimo con flechas numeradas 1, 2 y 3: (4,2) -> (3,1) -> (1,3) -> (2,4).
-- Diagonal directa bloqueada (4,2) -> (3,3) en línea punteada.
-- Casillas del otro color que el alfil, es decir con fila + columna impar, en gris: "descartadas".
-- Leyenda al costado y el resultado: "SI, 3 movimientos".
-Estilo: seguir content/attachments/illustration-style.css (SVG autocontenido, con modo claro y oscuro).
-Cuando el archivo exista, reemplazar este comentario por esta línea:
 ![Tablero de 4x4 con el recorrido óptimo del alfil](alfil-ejemplo.svg)
--->
 
 ![Árbol de llamadas de la fuerza bruta en el tablero de 4x4](alfil-fb-arbol.svg)
 
@@ -125,9 +113,10 @@ Lo que se mide al correrlo, de esquina a esquina en un tablero **sin obstáculos
 | 3×3 | 8 |
 | 4×4 | 110 |
 | 5×5 | 27.408 |
-| 6×6 | no terminó en 10 minutos |
+| 6×6 | 27.341.862 (unos 40 s) |
+| 7×7 | no terminó en 9 minutos |
 
-Paradójicamente, el tablero vacío es el peor caso: sin obstáculos hay muchísimos más caminos para enumerar, aunque la respuesta sea siempre 1 o 2.
+Paradójicamente, el tablero vacío es el peor caso: todo camino simple de un tablero con obstáculos también existe en el tablero vacío, así que sacar obstáculos solo agrega caminos para enumerar, aunque la respuesta sea siempre 1 o 2.
 
 ![Crecimiento de las llamadas de la fuerza bruta según el tamaño del tablero](alfil-fb-crecimiento.svg)
 
@@ -139,12 +128,12 @@ $O(L)$, que es $O(n^2)$: la profundidad máxima de la recursión (la pila de lla
 
 ### Favorable cuando
 
-- El tablero es muy chico (hasta 4×4 o 5×5) y se quiere una respuesta que sea **trivialmente correcta**, por ejemplo para verificar otra solución: así se probó la de [[alfil-branch-and-bound]] contra esta en miles de tableros aleatorios.
+- El tablero es muy chico (hasta 5×5; con 6×6 ya tarda unos 40 segundos) y se quiere una respuesta que sea **trivialmente correcta**, por ejemplo para verificar otra solución: así se probó la de [[alfil-branch-and-bound]] contra esta en miles de tableros aleatorios.
 - Se necesitan **todos** los caminos (por ejemplo, contarlos o listarlos), no solo el mínimo.
 
 ### Limitaciones
 
-- Inviable desde 6×6: el enunciado permite $n \le 1000$.
+- Inviable desde 7×7: el enunciado permite $n \le 1000$.
 - Hace muchísimo trabajo repetido: llega a la misma casilla por caminos distintos y vuelve a explorar todo lo que sigue desde ahí, aunque ya haya llegado antes con menos movimientos.
 - No aprovecha que se busca un **mínimo**: sigue explorando caminos que ya son más largos que la mejor solución conocida.
 
@@ -158,7 +147,7 @@ $O(L)$, que es $O(n^2)$: la profundidad máxima de la recursión (la pila de lla
 | Caminos más largos que el mejor | Los explora igual | Los poda con la cota inferior |
 | Llegar a una casilla ya visitada con más movimientos | La explora de nuevo | La descarta (poda por dominancia) |
 | Ejemplo 4×4 | 10 llamadas, encuentra 4 antes que 3 | 3 casillas expandidas; el primer camino que encuentra ya es el óptimo |
-| Peor caso | Exponencial | Polinomial: $O(n^3 \log n)$ |
+| Peor caso | Exponencial | Polinomial: $O(n^3)$ |
 
 Agregarle a esta solución una sola línea, `if movidas >= mejor: return`, ya la convierte en un *backtracking* con poda. Branch and Bound va más allá: además de cortar, elige **qué** explorar primero.
 
