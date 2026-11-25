@@ -87,31 +87,9 @@ def branch_and_bound(tablero, origen, destino):
 
 Sobre el tablero de 4×4 de la descripción: inicio `(4, 2)`, destino `(2, 4)` y obstáculo en `(3, 3)`.
 
-<!--
-SVG PENDIENTE: content/attachments/bestiario/oia/alfil-ejemplo.svg
-(es la misma imagen para alfil.md, alfil-fuerza-bruta.md y alfil-branch-and-bound.md: se crea una sola vez)
-Qué mostrar: tablero de 4x4 con índices de fila y columna del 1 al 4 (fila 1 arriba).
-- Inicio "A" en (4,2), destino "O" en (2,4), obstáculo "X" en (3,3).
-- Recorrido óptimo con flechas numeradas 1, 2 y 3: (4,2) -> (3,1) -> (1,3) -> (2,4).
-- Diagonal directa bloqueada (4,2) -> (3,3) en línea punteada.
-- Casillas del otro color que el alfil, es decir con fila + columna impar, en gris: "descartadas".
-- Leyenda al costado y el resultado: "SI, 3 movimientos".
-Estilo: seguir content/attachments/illustration-style.css (SVG autocontenido, con modo claro y oscuro).
-Cuando el archivo exista, reemplazar este comentario por esta línea:
 ![Tablero de 4x4 con el recorrido óptimo del alfil](alfil-ejemplo.svg)
--->
 
-<!--
-SVG PENDIENTE (opcional): content/attachments/bestiario/oia/alfil-bnb-traza.svg
-Qué mostrar: el árbol de búsqueda de la tabla de abajo. Cada nodo es una casilla con su g y su g+h:
-(4,2) g=0 f=1 -> (3,1) g=1 f=3 -> hijos (1,3) g=2 f=3 y (2,2) g=2 f=4.
-(1,3) -> (2,4) g=3 f=3: DESTINO, mejor = 3.
-(2,2) tachado: "podado por cota, 4 >= 3".
-Numerar los nodos en el orden en que salen del heap (pasos 1 a 5).
-Estilo: content/attachments/illustration-style.css.
-Cuando el archivo exista, reemplazar este comentario por esta línea:
 ![Árbol de búsqueda de Branch and Bound en el tablero de 4x4](alfil-bnb-traza.svg)
--->
 
 Chequeo inicial: $(4 + 2) \bmod 2 = (2 + 4) \bmod 2 = 0$, mismo color. Se sigue.
 
@@ -131,15 +109,17 @@ Sea $n$ el lado del tablero.
 
 ### Temporal
 
-$O(n^3 \log n)$ en el peor caso:
+$O(n^3)$ en el peor caso:
 
-- Gracias a la poda por dominancia y a que la cota es **consistente** ($h(a) \le 1 + h(b)$ para todo movimiento $a \to b$), cada casilla se expande a lo sumo una vez, con su menor $g$. Las extracciones repetidas se descartan en $O(1)$.
-- Expandir una casilla cuesta $O(n)$, porque desliza en cuatro diagonales de largo hasta $n$.
-- En total se generan $O(n^2 \cdot n)$ hijos, y cada inserción en el *heap* cuesta $O(\log n^3) = O(\log n)$.
+- Gracias a la poda por dominancia y a que la cota es **consistente** ($h(a) \le 1 + h(b)$ para todo movimiento $a \to b$), cada casilla se expande a lo sumo una vez, con su menor $g$.
+- Expandir una casilla cuesta $O(n)$, porque desliza en cuatro diagonales de largo hasta $n$. Con $O(n^2)$ casillas, eso da $O(n^3)$.
+- Cada casilla entra al *heap* **una sola vez** (ver abajo). Entonces hay $O(n^2)$ inserciones y extracciones de $O(\log n)$ cada una: $O(n^2 \log n)$, que queda dominado por $O(n^3)$.
+
+**Por qué cada casilla entra una sola vez al heap.** Para que una casilla entre dos veces, tendría que mejorar su $g$. Eso pide un padre $p_2$ con $g$ menor que el del padre anterior $p_1$, pero extraído después que él. El *heap* saca en orden no decreciente de $g + h$, y toda casilla que se expande tiene $h \in \{1, 2\}$ (el destino no se expande). Entonces eso solo es posible si $g(p_2) = g(p_1) - 1$ y los dos tienen la misma cota. Pero el padre de $p_2$ tiene una cota menor que $p_2$ (si fuera igual, su $h$ valdría 3), así que salió antes que $p_1$: $p_2$ ya estaba en el *heap* cuando salió $p_1$. Y con cotas iguales el *heap* desempata por $g$, porque la tupla es $(g + h, g, \text{casilla})$, así que habría salido $p_2$ primero. Contradicción. En 1500 tableros aleatorios de hasta 40×40, ninguna casilla entró más de una vez.
 
 ### Espacial
 
-$O(n^3)$ en el peor caso teórico, por el *heap*: puede tener una entrada por cada hijo generado. En la práctica se acota a $O(n^2)$, que es lo que ocupan `mejor_g` y la casilla de cada estado pendiente.
+$O(n^2)$: `mejor_g` guarda un valor por casilla y el *heap* tiene a lo sumo una entrada por casilla, porque cada casilla entra una sola vez (ver Temporal).
 
 ### Mediciones
 
@@ -151,7 +131,7 @@ Implementación en Python de este archivo, comparada con un BFS con barrido (ver
 | 30 % de obstáculos al azar | SI, 309 | 1,7 s | 1,1 s |
 | Destino encerrado (del mismo color, inalcanzable) | NO | 12 min (737 s) | 5,5 s |
 
-Cuando el destino está cerca, la cota lleva directo hacia él y Branch and Bound es el más rápido. Cuando no hay solución, la cota no poda nada y se paga entero el $O(n^3 \log n)$.
+Cuando el destino está cerca, la cota lleva directo hacia él y Branch and Bound es el más rápido. Cuando no hay solución, la cota no poda nada y se paga entero el $O(n^3)$.
 
 ### Mejora posible: barrido por dirección
 
@@ -163,7 +143,7 @@ Con la estrategia FIFO (el BFS del parcial) se puede bajar a $O(n^2)$. Al desliz
 
 - Se busca un **óptimo** (el mínimo de movimientos) y existe una cota inferior barata y válida.
 - El destino está "cerca en línea recta": la cota guía la búsqueda directo hacia él y la poda corta el resto apenas aparece una solución.
-- Tableros grandes con solución: con $n = 1000$ resuelve en segundos o menos (ver Mediciones), mientras que la fuerza bruta ya no termina con $n = 6$.
+- Tableros grandes con solución: con $n = 1000$ resuelve en segundos o menos (ver Mediciones), mientras que la fuerza bruta ya no termina con $n = 7$.
 
 ### Limitaciones
 
@@ -176,10 +156,11 @@ Con la estrategia FIFO (el BFS del parcial) se puede bajar a $O(n^2)$. Al desliz
 | | [[alfil-fuerza-bruta]] | Branch and Bound |
 |---|---|---|
 | Qué explora | Todos los caminos simples | Cada casilla, una vez, en orden de cota |
-| Peor caso temporal | Exponencial, $O(n \cdot b^{L})$ | Polinomial, $O(n^3 \log n)$ |
-| Espacio | $O(n^2)$ (pila de recursión) | $O(n^2)$ en la práctica ($O(n^3)$ teórico) |
+| Peor caso temporal | Exponencial, $O(n \cdot b^{L})$ | Polinomial, $O(n^3)$ |
+| Espacio | $O(n^2)$ (pila de recursión) | $O(n^2)$ |
 | Ejemplo 4×4 | 10 llamadas | 3 expansiones |
-| Tablero vacío de 6×6 | No termina en 10 minutos | Instantáneo |
+| Tablero vacío de 6×6 | Unos 40 s (27 millones de llamadas) | Instantáneo |
+| Tablero vacío de 7×7 | No terminó en 9 minutos | Instantáneo |
 | 1000×1000 con 30 % de obstáculos | Impensable | 1,7 s |
 | Correctitud | Evidente: prueba todo | Depende de que la cota sea válida |
 
