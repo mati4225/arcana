@@ -34,6 +34,11 @@ La dificultad aparece al introducir obstáculos: una diagonal que parecía direc
 - Primera línea: `SI` si es posible llegar al destino, o `NO` en caso contrario.
 - Segunda línea: la cantidad mínima de movimientos necesarios (o `0` si la respuesta es `NO`).
 
+**Restricciones:**
+- El alfil se mueve solo en diagonal, una o más casillas por movimiento, sin salir del tablero, sin atravesar obstáculos y sin terminar sobre uno.
+- Se asume que la casilla inicial está libre, porque es donde está el alfil. Si el destino tiene un obstáculo, la respuesta es `NO`.
+- Si el inicio coincide con el destino, la respuesta es `SI` con `0` movimientos.
+  
 ---
 
 ## Ejemplo concreto
@@ -53,19 +58,7 @@ Consideremos un tablero pequeño de $4 \times 4$:
 
 Aunque `(4, 2)` y `(2, 4)` están en la misma diagonal, el obstáculo en `(3, 3)` bloquea el camino directo. El alfil debe rodearlo:
 
-<!--
-SVG PENDIENTE: content/attachments/bestiario/oia/alfil-ejemplo.svg
-(es la misma imagen para alfil.md, alfil-fuerza-bruta.md y alfil-branch-and-bound.md: se crea una sola vez)
-Qué mostrar: tablero de 4x4 con índices de fila y columna del 1 al 4 (fila 1 arriba).
-- Inicio "A" en (4,2), destino "O" en (2,4), obstáculo "X" en (3,3).
-- Recorrido óptimo con flechas numeradas 1, 2 y 3: (4,2) -> (3,1) -> (1,3) -> (2,4).
-- Diagonal directa bloqueada (4,2) -> (3,3) en línea punteada.
-- Casillas del otro color que el alfil, es decir con fila + columna impar, en gris: "descartadas".
-- Leyenda al costado y el resultado: "SI, 3 movimientos".
-Estilo: seguir content/attachments/illustration-style.css (SVG autocontenido, con modo claro y oscuro).
-Cuando el archivo exista, reemplazar este comentario por esta línea:
 ![Tablero de 4x4 con el recorrido óptimo del alfil](alfil-ejemplo.svg)
--->
 
 1. `(4, 2)` → `(3, 1)` *(1 movimiento)*
 2. `(3, 1)` → `(1, 3)` *(2 movimientos)*
@@ -77,17 +70,17 @@ Cuando el archivo exista, reemplazar este comentario por esta línea:
 
 ## Por dónde empezar
 
+Conviene pensar el tablero como un [[graph]]: cada casilla libre es un vértice y hay una arista entre dos casillas si el alfil pasa de una a la otra en un solo movimiento. Como todos los movimientos "cuestan" lo mismo, la respuesta es el camino con menos aristas entre el inicio y el destino.
+
 El primer chequeo inmediato surge de las reglas del ajedrez: un alfil siempre se mantiene en casillas del mismo color. Si la casilla inicial $(x, y)$ y el destino $(u, v)$ tienen distinto color —es decir, $(x + y) \bmod 2 \neq (u + v) \bmod 2$—, es imposible llegar y se puede responder `NO` en $O(1)$. Por la misma razón, todas las casillas del color contrario al del alfil quedan automáticamente descartadas del análisis.
 
 Una primera aproximación directa es aplicar **fuerza bruta**, probando todos los caminos simples posibles desde el inicio hasta el destino. Sin embargo, este enfoque se queda corto rápidamente: en un solo movimiento, el alfil puede caer en muchas casillas diferentes a lo largo de sus cuatro diagonales, lo que abre una cantidad enorme de caminos en cada paso y vuelve inviable explorar el espacio completo cuando el tablero es grande.
 
 Para escalar a tableros grandes ($n \le 1000$), resulta necesario descartar ramas inútiles a medida que se explora, aplicando **Branch and Bound** (ramificación y poda) con una cota inferior simple basada en la geometría del tablero.
 
-Conviene pensar el tablero como un [[graph]]: cada casilla libre es un vértice y hay una arista entre dos casillas si el alfil pasa de una a la otra en un solo movimiento. Como todos los movimientos "cuestan" lo mismo, la respuesta es el camino con menos aristas entre el inicio y el destino.
-
 ---
 
 ## Soluciones disponibles
 
-- [[alfil-fuerza-bruta]]: prueba todos los caminos posibles. Exponencial; sirve para tableros de hasta 5×5.
-- [[alfil-branch-and-bound]]: explora primero los estados con menor cota y poda los que no pueden mejorar. Polinomial; resuelve tableros de 1000×1000.
+- [[alfil-fuerza-bruta]]: prueba todos los caminos posibles. Exponencial; sirve para tableros de hasta 6×6.
+- [[alfil-branch-and-bound]]: explora primero los estados con menor cota y poda los que no pueden mejorar. Polinomial, $O(n^3)$; con $n = 1000$ responde en segundos cuando hay solución, pero si el destino es inalcanzable puede tardar varios minutos.
