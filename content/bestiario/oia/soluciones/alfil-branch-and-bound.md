@@ -42,7 +42,7 @@ Es una cota válida porque nunca sobreestima. Si $c$ no está en una diagonal de
 
 El *heap* devuelve los estados en orden creciente de $g + h$. Cuando el estado de menor cota ya no puede mejorar la mejor solución, ningún otro puede: se termina la búsqueda entera con `break`, sin vaciar la cola.
 
-> **Relación con BFS.** Si en lugar de un *heap* se usa una [[queue]] FIFO (estrategia "en anchura") y se deja solo la poda por dominancia, este mismo algoritmo es exactamente un **BFS**: explora por niveles y la primera vez que llega al destino lo hace con el mínimo. Esa fue la solución que planteamos en el parcial. La estrategia LC con cota agrega el criterio de ir primero hacia donde *parece* estar el destino.
+> **Relación con BFS.** Si en lugar de un *heap* se usa una cola FIFO (estrategia "en anchura") y se deja solo la poda por dominancia, este mismo algoritmo es exactamente un **BFS**: explora por niveles y la primera vez que llega al destino lo hace con el mínimo. Esa fue la solución que planteamos en el parcial. La estrategia LC con cota agrega el criterio de ir primero hacia donde *parece* estar el destino.
 
 ## Código
 

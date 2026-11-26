@@ -122,7 +122,7 @@ Paradójicamente, el tablero vacío es el peor caso: todo camino simple de un ta
 
 ### Espacial
 
-$O(L)$, que es $O(n^2)$: la profundidad máxima de la recursión (la pila de llamadas) y el [[set]] con las casillas del camino actual. Sin contar el tablero de entrada.
+$O(L)$, que es $O(n^2)$: la profundidad máxima de la recursión (la pila de llamadas) y el set con las casillas del camino actual. Sin contar el tablero de entrada.
 
 ## Cuándo usar esta técnica
 
